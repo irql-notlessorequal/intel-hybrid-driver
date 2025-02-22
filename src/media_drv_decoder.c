@@ -55,35 +55,36 @@ intel_media_decode_picture(VADriverContextP ctx,
 						   union codec_state *codec_state,
 						   struct hw_context *hw_context)
 {
-  return VA_STATUS_ERROR_UNIMPLEMENTED;
+	return VA_STATUS_ERROR_UNIMPLEMENTED;
 }
 
 static void
 intel_media_context_destroy(void *hw_context)
 {
-  struct hw_context *decoder_context = hw_context;
+	struct hw_context *decoder_context = hw_context;
 
-  if (decoder_context)
-	free(decoder_context);
-  return;
+	if (decoder_context)
+		free(decoder_context);
+	return;
 }
 
 struct hw_context *
-media_dec_hw_context_init (VADriverContextP ctx,
-						   struct object_config *obj_config)
+media_dec_hw_context_init(VADriverContextP ctx,
+						  struct object_config *obj_config)
 {
-  MEDIA_DRV_CONTEXT *drv_ctx = (MEDIA_DRV_CONTEXT *) (ctx->pDriverData);
-  struct hw_context *decoder_context = NULL;
+	MEDIA_DRV_CONTEXT *drv_ctx = (MEDIA_DRV_CONTEXT *)(ctx->pDriverData);
+	struct hw_context *decoder_context = NULL;
 
-  if (drv_ctx->codec_info->vp9_dec_hybrid_support &&
-	  (obj_config->profile == VAProfileVP9Profile0)) {
-	return media_hybrid_dec_hw_context_init(ctx, obj_config);
-  }
+	if (drv_ctx->codec_info->vp9_dec_hybrid_support &&
+		(obj_config->profile == VAProfileVP9Profile0))
+	{
+		return media_hybrid_dec_hw_context_init(ctx, obj_config);
+	}
 
-  decoder_context = (struct hw_context *) media_drv_alloc_memory (sizeof(struct hw_context));
+	decoder_context = (struct hw_context *)media_drv_alloc_memory(sizeof(struct hw_context));
 
-  decoder_context->run = intel_media_decode_picture;
-  decoder_context->destroy = intel_media_context_destroy;
+	decoder_context->run = intel_media_decode_picture;
+	decoder_context->destroy = intel_media_context_destroy;
 
-  return decoder_context;
+	return decoder_context;
 }
