@@ -167,9 +167,12 @@ VOID media_driver_terminate(VADriverContextP ctx)
 {
 	MEDIA_DRV_CONTEXT *drv_ctx = NULL;
 	MEDIA_DRV_ASSERT(ctx);
-	drv_ctx = ctx->pDriverData;
-	media_drv_bufmgr_destroy(drv_ctx);
-	media_drv_mutex_destroy(&drv_ctx->ctxmutex);
+	
+	if ((drv_ctx = ctx->pDriverData))
+	{
+		media_drv_bufmgr_destroy(drv_ctx);
+		media_drv_mutex_destroy(&drv_ctx->ctxmutex);
+	}
 }
 
 BOOL media_driver_data_init(VADriverContextP ctx)
