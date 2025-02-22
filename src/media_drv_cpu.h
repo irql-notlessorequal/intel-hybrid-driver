@@ -1,13 +1,10 @@
 #ifndef SNA_CPUID_H
 #define SNA_CPUID_H
 
-#ifdef HAVE_CPUID_H
+/**
+ * It's mandatory unlike in xf86-video-intel.
+ */
 #include <cpuid.h>
-#else
-#define __get_cpuid_max(x, y) 0
-#define __cpuid(level, a, b, c, d) a = b = c = d = 0
-#define __cpuid_count(level, count, a, b, c, d) a = b = c = d = 0
-#endif
 
 #define BASIC_CPUID 0x0
 #define EXTENDED_CPUID 0x80000000

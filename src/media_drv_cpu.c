@@ -25,6 +25,7 @@
  *
  * Taken directly from the xf86-video-intel project.
  */
+#include <stddef.h>
 
 #include "media_drv_cpu.h"
 #include "media_drv_cpuid.h"
