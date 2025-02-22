@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -29,13 +29,12 @@
 #include "media_drv_hybrid_vp9_common.h"
 #include "decode_hybrid_vp9.h"
 
-
 extern struct hw_context *
 media_hybrid_dec_hw_context_init(VADriverContextP ctx, struct object_config *obj_config)
 {
-  void *vp9_context = calloc(1, sizeof(hybrid_vp9_hw_context));
+	void *vp9_context = calloc(1, sizeof(hybrid_vp9_hw_context));
 
-  Intel_HybridVp9Decode_Initialize(ctx, (void *)vp9_context);
+	Intel_HybridVp9Decode_Initialize(ctx, (void *)vp9_context);
 
-  return (struct hw_context *)(vp9_context);
+	return (struct hw_context *)(vp9_context);
 }

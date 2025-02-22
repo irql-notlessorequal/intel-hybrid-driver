@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -27,7 +27,7 @@
  */
 
 /*
- * Copyright (c) 2010, The WebM Project authors. All rights reserved.
+ * Copyright (C) 2010, The WebM Project authors. All rights reserved.
  *
  * An additional intellectual property rights grant can be found
  * in the file LIBVPX_PATENTS.  All contributing project authors may
@@ -80,8 +80,8 @@
 #define INTEL_HOSTVLD_VP9_BACENGINE_FILL()           \
 do                                                      \
 { \
-    if (iCount < BAC_ENG_VALUE_HEAD_RSRV)                                     \
-    {                                                   \
+	if (iCount < BAC_ENG_VALUE_HEAD_RSRV)                                     \
+	{                                                   \
 	if ((pBacEngine->pBufEnd - pBacEngine->pBuf) >= 2 ) { \
 		register UINT16 ui16RegOp = *((PUINT16)(pBacEngine->pBuf));                     \
 		BacValue |= (ui16RegOp & 0xFF) << (BAC_ENG_VALUE_BITS - BYTE_BITS - iCount);    \
@@ -94,29 +94,29 @@ do                                                      \
 		pBacEngine->pBuf += 1;                          \
 		iCount += BAC_ENG_MASSIVE_BITS;                     \
 	} \
-    }                                                   \
+	}                                                   \
 } while (0)
 
 extern const UCHAR g_Vp9NormTable[BAC_ENG_MAX_RANGE+1];
 
 INT Intel_HostvldVp9_BacEngineInit(
-    PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
-    PUCHAR                           pBuf,
-    DWORD                            dwBufSize);
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
+	PUCHAR                           pBuf,
+	DWORD                            dwBufSize);
 
 INT Intel_HostvldVp9_BacEngineReadBit(
-    PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
-    INT                              iProb);
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
+	INT                              iProb);
 
 INT Intel_HostvldVp9_BacEngineReadSingleBit(
-    PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine);
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine);
 
 INT Intel_HostvldVp9_BacEngineReadMultiBits(
-    PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
-    register INT                     iNumBits);
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
+	register INT                     iNumBits);
 
 INT Intel_HostvldVp9_BacEngineReadTree(
-    PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
-    INTEL_HOSTVLD_VP9_TKN_TREE    TknTree);
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
+	INTEL_HOSTVLD_VP9_TKN_TREE    TknTree);
 
 #endif // __INTEL_HOSTVLD_VP9_ENGINE_H__

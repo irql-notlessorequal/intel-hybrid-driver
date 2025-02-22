@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2012 Intel Corporation. All Rights Reserved.
+ * Copyright (C) 2012 Intel Corporation
+ * All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -25,38 +26,37 @@
 #ifndef __VA_PRIVATE_H__
 #define __VA_PRIVATE_H__
 
-#define VAEncMiscParameterTypePrivate   -2
-#define VAEncMbDataBufferType	        -4
-#define VAEncMiscParameterTypeVP8HybridFrameUpdate      -3
-#define VAEncMiscParameterTypeVP8SegmentMapParams	-4
+#define VAEncMiscParameterTypePrivate -2
+#define VAEncMbDataBufferType -4
+#define VAEncMiscParameterTypeVP8HybridFrameUpdate -3
+#define VAEncMiscParameterTypeVP8SegmentMapParams -4
 
 typedef struct _VAEncMbDataLayout
 {
-    unsigned char MbCodeSize;
-    unsigned int  MbCodeOffset;
-    unsigned int  MbCodeStride;
-    unsigned char MvNumber;
-    unsigned int  MvOffset;
-    unsigned int  MvStride;
+	unsigned char MbCodeSize;
+	unsigned int MbCodeOffset;
+	unsigned int MbCodeStride;
+	unsigned char MvNumber;
+	unsigned int MvOffset;
+	unsigned int MvStride;
 
 } VAEncMbDataLayout;
 
 typedef struct _VAEncMiscParameterVP8HybridFrameUpdate
 {
-    unsigned int    prev_frame_size;
-    bool            two_prev_frame_size;
-    unsigned short  ref_frame_cost[4];
-    unsigned short  intra_mode_cost[4];
-    unsigned short  inter_mode_cost[4];
-    unsigned short   intra_non_dc_penalty_16x16;
-    unsigned short   intra_non_dc_penalty_4x4;
-    unsigned char   ref_q_index[3];
+	unsigned int prev_frame_size;
+	bool two_prev_frame_size;
+	unsigned short ref_frame_cost[4];
+	unsigned short intra_mode_cost[4];
+	unsigned short inter_mode_cost[4];
+	unsigned short intra_non_dc_penalty_16x16;
+	unsigned short intra_non_dc_penalty_4x4;
+	unsigned char ref_q_index[3];
 } VAEncMiscParameterVP8HybridFrameUpdate;
 
 typedef struct _VAEncMiscParameterVP8FrameRate
 {
-    unsigned int    frame_rate;
+	unsigned int frame_rate;
 } VAEncMiscParameterVP8FrameRate;
 
 #endif
-

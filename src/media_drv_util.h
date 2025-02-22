@@ -1,5 +1,5 @@
 /*
- * Copyright ©  2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -39,32 +39,30 @@
 #include "media_drv_data.h"
 
 #define MEDIA_DRV_ASSERT(val) assert(val);
-#define ALIGN(i, n)    (((i) + (n) - 1) & ~((n) - 1))
-#define ALIGN_FLOOR(i,n)     ((i) & (~(n-1)))
+#define ALIGN(i, n) (((i) + (n) - 1) & ~((n) - 1))
+#define ALIGN_FLOOR(i, n) ((i) & (~(n - 1)))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define ARRAY_ELEMS(a) (sizeof(a) / sizeof((a)[0]))
 typedef enum _MEDIA_DRV_STATUS_
 {
-  SUCESSS,
-  INVALID_PARAMETER,
-  UNKNOW_STATUS
+	SUCESSS,
+	INVALID_PARAMETER,
+	UNKNOW_STATUS
 } MEDIA_DRV_STATUS;
-BOOL
-media_drv_memcpy (VOID * dst_ptr, size_t dst_len, const VOID * src_ptr,
-		  size_t src_len);
+BOOL media_drv_memcpy(VOID *dst_ptr, size_t dst_len, const VOID *src_ptr,
+					  size_t src_len);
 
-VOID media_drv_mutex_init (MEDIA_DRV_MUTEX * mutex);
-VOID media_drv_mutex_destroy (MEDIA_DRV_MUTEX * mutex);
-INT media_get_sampling_from_fourcc (UINT fourcc);
-VOID *media_drv_alloc_memory ( /*size_t */ UINT size);
-VOID media_drv_free_memory (VOID * ptr);
-INT get_sampling_from_fourcc (UINT fourcc);
-VOID
-media_guess_surface_format (VADriverContextP ctx,
-			    VASurfaceID surface,
-			    UINT * fourcc, UINT * is_tiled);
-VOID media_drv_memset (VOID * dest_ptr, size_t len);
+VOID media_drv_mutex_init(MEDIA_DRV_MUTEX *mutex);
+VOID media_drv_mutex_destroy(MEDIA_DRV_MUTEX *mutex);
+INT media_get_sampling_from_fourcc(UINT fourcc);
+VOID *media_drv_alloc_memory(/*size_t */ UINT size);
+VOID media_drv_free_memory(VOID *ptr);
+INT get_sampling_from_fourcc(UINT fourcc);
+VOID media_guess_surface_format(VADriverContextP ctx,
+								VASurfaceID surface,
+								UINT *fourcc, UINT *is_tiled);
+VOID media_drv_memset(VOID *dest_ptr, size_t len);
 int media_drv_va_misc_type_to_index(VAEncMiscParameterType type);
 VAEncMiscParameterType media_drv_index_to_va_misc_type(int index);
 

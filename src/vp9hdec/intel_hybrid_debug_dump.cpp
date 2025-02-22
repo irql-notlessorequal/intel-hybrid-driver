@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -37,142 +37,142 @@
 #include <malloc.h>
 
 static int intel_hybrid_createfile(
-    int		*fd,
-    const char           *lpFileName,
-    uint32_t                iOpenFlag)
+	int		*fd,
+	const char           *lpFileName,
+	uint32_t                iOpenFlag)
 {
-    int               iFileDescriptor;
-    uint32_t              mode;
-    int error_index;
+	int               iFileDescriptor;
+	uint32_t              mode;
+	int error_index;
 
-    if((lpFileName == NULL) || (fd == NULL))
-    {
-        return -EINVAL;
-    }
-    //set read/write access right for usr/group, mMode only takes effect when
-    //O_CREAT is set
-    mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
-    if ( (iFileDescriptor = open(lpFileName, iOpenFlag, mode)) < 0 )
-    {
-        *fd = 0;
-        error_index = errno;
-        return -error_index;
-    }
+	if((lpFileName == NULL) || (fd == NULL))
+	{
+		return -EINVAL;
+	}
+	//set read/write access right for usr/group, mMode only takes effect when
+	//O_CREAT is set
+	mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
+	if ( (iFileDescriptor = open(lpFileName, iOpenFlag, mode)) < 0 )
+	{
+		*fd = 0;
+		error_index = errno;
+		return -error_index;
+	}
 
-    *fd = iFileDescriptor;
-    return 0;
+	*fd = iFileDescriptor;
+	return 0;
 }
 
 static int intel_hybrid_writefile(
-    int           fd,
-    void            *lpBuffer,
-    uint32_t           bytesToWrite,
-    uint32_t          *pbytesWritten)
+	int           fd,
+	void            *lpBuffer,
+	uint32_t           bytesToWrite,
+	uint32_t          *pbytesWritten)
 {
-    size_t    nNumBytesToWrite;
-    ssize_t   nNumBytesWritten;
+	size_t    nNumBytesToWrite;
+	ssize_t   nNumBytesWritten;
 
-    if((!fd) || (lpBuffer == NULL) || (pbytesWritten == NULL))
-    {
-        return -EINVAL;
-    }
+	if((!fd) || (lpBuffer == NULL) || (pbytesWritten == NULL))
+	{
+		return -EINVAL;
+	}
 
-    nNumBytesToWrite = (size_t)bytesToWrite;
-    nNumBytesWritten = 0;
+	nNumBytesToWrite = (size_t)bytesToWrite;
+	nNumBytesWritten = 0;
 
 
-    if ((nNumBytesWritten = write(fd, lpBuffer, nNumBytesToWrite)) < 0)
-    {
-        int ret_val = -errno;
-        *pbytesWritten = 0;
-        return ret_val;
-    }
+	if ((nNumBytesWritten = write(fd, lpBuffer, nNumBytesToWrite)) < 0)
+	{
+		int ret_val = -errno;
+		*pbytesWritten = 0;
+		return ret_val;
+	}
 
-    *pbytesWritten = (uint32_t)nNumBytesWritten;
-    return 0;
+	*pbytesWritten = (uint32_t)nNumBytesWritten;
+	return 0;
 }
 
 int intel_hybrid_writefilefromptr(
-    const char                  *pFilename,
-    void                   *lpBuffer,
-    uint32_t                  writeSize)
+	const char                  *pFilename,
+	void                   *lpBuffer,
+	uint32_t                  writeSize)
 {
-    int         fd;
-    uint32_t          bytesWritten;
-    int ret_val = 0;
+	int         fd;
+	uint32_t          bytesWritten;
+	int ret_val = 0;
 
-    bytesWritten    = 0;
+	bytesWritten    = 0;
 
-    ret_val = intel_hybrid_createfile(&fd, pFilename, O_WRONLY|O_CREAT | O_TRUNC);
+	ret_val = intel_hybrid_createfile(&fd, pFilename, O_WRONLY|O_CREAT | O_TRUNC);
 
-    if (ret_val) {
-        printf("failed to open %s, err %d\n", pFilename, ret_val);
-        return ret_val;
-    }
+	if (ret_val) {
+		printf("failed to open %s, err %d\n", pFilename, ret_val);
+		return ret_val;
+	}
 
-    if((ret_val = intel_hybrid_writefile(fd, lpBuffer, writeSize, &bytesWritten)))
-    {
-        printf("failed to write %s, err %d\n", pFilename, ret_val);
-        close(fd);
-        return ret_val;
-    }
+	if((ret_val = intel_hybrid_writefile(fd, lpBuffer, writeSize, &bytesWritten)))
+	{
+		printf("failed to write %s, err %d\n", pFilename, ret_val);
+		close(fd);
+		return ret_val;
+	}
 
-    close(fd);
-    return 0;
+	close(fd);
+	return 0;
 }
 
 
 int intel_hybrid_appendfilefromptr(
-    const char              *pFilename,
-    void                    *pData,
-    uint32_t                    dwSize)
+	const char              *pFilename,
+	void                    *pData,
+	uint32_t                    dwSize)
 {
-    int ret_val = 0;
-    int fd;
-    uint32_t      dwWritten;
+	int ret_val = 0;
+	int fd;
+	uint32_t      dwWritten;
 
-    dwWritten   = 0;
+	dwWritten   = 0;
 
-    ret_val = intel_hybrid_createfile(&fd, pFilename, O_WRONLY|O_CREAT);
-    if (ret_val)
-    {
-        printf("Failed to Create file %s\n", pFilename);
-        return ret_val;
-    }
+	ret_val = intel_hybrid_createfile(&fd, pFilename, O_WRONLY|O_CREAT);
+	if (ret_val)
+	{
+		printf("Failed to Create file %s\n", pFilename);
+		return ret_val;
+	}
 
-    if (lseek(fd, 0, SEEK_END) < 0)
-    {
-        printf("Failed to seek %s, err %d\n", pFilename, ret_val);
-        close(fd);
-        return ret_val;
-    }
+	if (lseek(fd, 0, SEEK_END) < 0)
+	{
+		printf("Failed to seek %s, err %d\n", pFilename, ret_val);
+		close(fd);
+		return ret_val;
+	}
 
-    // Write the file
-    if(intel_hybrid_writefile(fd, pData, dwSize, &dwWritten))
-    {
-        printf("Failed to write to file %s ", pFilename);
-        close(fd);
-        return -1;
-    }
+	// Write the file
+	if(intel_hybrid_writefile(fd, pData, dwSize, &dwWritten))
+	{
+		printf("Failed to write to file %s ", pFilename);
+		close(fd);
+		return -1;
+	}
 
-    close(fd);
-    return ret_val;
+	close(fd);
+	return ret_val;
 }
 
 
 char *intel_alloc_zero_aligned_memory(uint32_t size, unsigned int alignment)
 {
-     char *ptr;
-     size_t tmp_size;
+	 char *ptr;
+	 size_t tmp_size;
 
-     tmp_size = ALIGN(size, alignment);
-     ptr = (char *)memalign(alignment, tmp_size);
+	 tmp_size = ALIGN(size, alignment);
+	 ptr = (char *)memalign(alignment, tmp_size);
 
-     if (ptr) {
-         memset(ptr, 0, tmp_size);
-     }
+	 if (ptr) {
+		 memset(ptr, 0, tmp_size);
+	 }
 
-     return ptr;
+	 return ptr;
 }
 
 

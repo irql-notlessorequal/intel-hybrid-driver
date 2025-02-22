@@ -1,5 +1,5 @@
 /*
- * Copyright ©  2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -32,84 +32,78 @@
 #include "media_drv_util.h"
 
 STATUS
-media_object_walker_cmd_g8 (MEDIA_BATCH_BUFFER * batch,
-			    MEDIA_OBJ_WALKER_PARAMS * params)
+media_object_walker_cmd_g8(MEDIA_BATCH_BUFFER *batch,
+						   MEDIA_OBJ_WALKER_PARAMS *params)
 {
-  STATUS status = SUCCESS;
-  UINT dw5_cmd = 0, dw10_cmd = 0, dw11_cmd = 0, dw12_cmd =
-    0 /*,use_scoreboard=0 */ ;
-  UINT mode = params->walker_mode;
-  UINT repel = (mode == SINGLE_MODE) ? 1 : 0;
-  UINT dual_mode = (mode == DUAL_MODE) ? 1 : 0;
-  UINT quad_mode = (mode == QUAD_MODE) ? 1 : 0;
-  BEGIN_BATCH (batch, CMD_MEDIA_OBJECT_WALKER_LEN /*17 */ );
-  if (params->mb_enc_iframe_dist_en || params->me_in_use)
-    {
-      //use_scoreboard=0;
-      dw5_cmd = 0;
-      //dw10_cmd = (params->frm_w_in_mb - 1);    //do we really need to set this for HSW
-      dw11_cmd = dw11_cmd | 1 << 16;
-      dw12_cmd = dw12_cmd | 0x1;
-    }
-  else
-    {
-      //use_scoreboard=params->use_scoreboard;
-      dw10_cmd = 0;
-      if (params->walker_degree == DEGREE_46)
+	STATUS status = SUCCESS;
+	UINT dw5_cmd = 0, dw10_cmd = 0, dw11_cmd = 0, dw12_cmd = 0 /*,use_scoreboard=0 */;
+	UINT mode = params->walker_mode;
+	UINT repel = (mode == SINGLE_MODE) ? 1 : 0;
+	UINT dual_mode = (mode == DUAL_MODE) ? 1 : 0;
+	UINT quad_mode = (mode == QUAD_MODE) ? 1 : 0;
+	BEGIN_BATCH(batch, CMD_MEDIA_OBJECT_WALKER_LEN /*17 */);
+	if (params->mb_enc_iframe_dist_en || params->me_in_use)
 	{
-	  dw5_cmd = params->scoreboard_mask;
-	  dw11_cmd = 0x1;
-	  dw12_cmd = dw12_cmd | 1 << 16 | 0x3FF;
+		// use_scoreboard=0;
+		dw5_cmd = 0;
+		// dw10_cmd = (params->frm_w_in_mb - 1);    //do we really need to set this for HSW
+		dw11_cmd = dw11_cmd | 1 << 16;
+		dw12_cmd = dw12_cmd | 0x1;
 	}
-      /* else if ((params->pic_coding_type == I_FRM ||
-         (params->pic_coding_type == B_FRM &&
-         !params->direct_spatial_mv_pred)) &&
-         !params->force_26_degree)
-         {
-         dw5_cmd = 0x3;
-         dw11_cmd = 0x1;
-         dw12_cmd = dw12_cmd | 1 << 16 | 0x3FF;
+	else
+	{
+		// use_scoreboard=params->use_scoreboard;
+		dw10_cmd = 0;
+		if (params->walker_degree == DEGREE_46)
+		{
+			dw5_cmd = params->scoreboard_mask;
+			dw11_cmd = 0x1;
+			dw12_cmd = dw12_cmd | 1 << 16 | 0x3FF;
+		}
+		/* else if ((params->pic_coding_type == I_FRM ||
+		   (params->pic_coding_type == B_FRM &&
+		   !params->direct_spatial_mv_pred)) &&
+		   !params->force_26_degree)
+		   {
+		   dw5_cmd = 0x3;
+		   dw11_cmd = 0x1;
+		   dw12_cmd = dw12_cmd | 1 << 16 | 0x3FF;
 
-         } */
-      else if ((params->hybrid_pak2_pattern_enabled_45_deg)
-	       ||
-	       ((params->pic_coding_type == I_FRM
-		 || (params->pic_coding_type == B_FRM
-		     && !params->direct_spatial_mv_pred))
-		&& !params->force_26_degree))
-	{
-	  dw5_cmd = 0x3;
-	  dw11_cmd = 0x1;
-	  dw12_cmd = dw12_cmd | 1 << 16 | 0x3FF;
+		   } */
+		else if ((params->hybrid_pak2_pattern_enabled_45_deg) ||
+				 ((params->pic_coding_type == I_FRM || (params->pic_coding_type == B_FRM && !params->direct_spatial_mv_pred)) && !params->force_26_degree))
+		{
+			dw5_cmd = 0x3;
+			dw11_cmd = 0x1;
+			dw12_cmd = dw12_cmd | 1 << 16 | 0x3FF;
+		}
+		else
+		{
+			dw5_cmd = 0x0F;
+			dw11_cmd = 0x1;
+			dw12_cmd = dw12_cmd | 1 << 16 | 0x3FE;
+		}
 	}
-      else
-	{
-	  dw5_cmd = 0x0F;
-	  dw11_cmd = 0x1;
-	  dw12_cmd = dw12_cmd | 1 << 16 | 0x3FE;
-	}
-
-    }
-  OUT_BATCH (batch,
-	     CMD_MEDIA_OBJECT_WALKER | (CMD_MEDIA_OBJECT_WALKER_LEN - 2));
-  OUT_BATCH (batch, 0);
-  OUT_BATCH (batch, params->use_scoreboard << 21);
-  OUT_BATCH (batch, 0);
-  OUT_BATCH (batch, 0);
-  OUT_BATCH (batch, dw5_cmd);
-  OUT_BATCH (batch, ((dual_mode << 31) | (repel << 30) | (quad_mode << 29)));
-  OUT_BATCH (batch, ((0x3FF << 16) | 0x3FF));
-  OUT_BATCH (batch, ((params->frmfield_h_in_mb << 16) | params->frm_w_in_mb));
-  OUT_BATCH (batch, 0);
-  OUT_BATCH (batch, dw10_cmd);
-  OUT_BATCH (batch, dw11_cmd);
-  OUT_BATCH (batch, dw12_cmd);
-  OUT_BATCH (batch, ((params->frmfield_h_in_mb << 16) | params->frm_w_in_mb));
-  OUT_BATCH (batch, 0);
-  OUT_BATCH (batch, (0 | params->frm_w_in_mb));
-  OUT_BATCH (batch, (0 | (params->frmfield_h_in_mb << 16)));
-  ADVANCE_BATCH (batch);
-  return status;
+	OUT_BATCH(batch,
+			  CMD_MEDIA_OBJECT_WALKER | (CMD_MEDIA_OBJECT_WALKER_LEN - 2));
+	OUT_BATCH(batch, 0);
+	OUT_BATCH(batch, params->use_scoreboard << 21);
+	OUT_BATCH(batch, 0);
+	OUT_BATCH(batch, 0);
+	OUT_BATCH(batch, dw5_cmd);
+	OUT_BATCH(batch, ((dual_mode << 31) | (repel << 30) | (quad_mode << 29)));
+	OUT_BATCH(batch, ((0x3FF << 16) | 0x3FF));
+	OUT_BATCH(batch, ((params->frmfield_h_in_mb << 16) | params->frm_w_in_mb));
+	OUT_BATCH(batch, 0);
+	OUT_BATCH(batch, dw10_cmd);
+	OUT_BATCH(batch, dw11_cmd);
+	OUT_BATCH(batch, dw12_cmd);
+	OUT_BATCH(batch, ((params->frmfield_h_in_mb << 16) | params->frm_w_in_mb));
+	OUT_BATCH(batch, 0);
+	OUT_BATCH(batch, (0 | params->frm_w_in_mb));
+	OUT_BATCH(batch, (0 | (params->frmfield_h_in_mb << 16)));
+	ADVANCE_BATCH(batch);
+	return status;
 }
 #if 0
 STATUS
@@ -180,105 +174,104 @@ mediadrv_gen_pipe_ctrl_cmd_g8 (MEDIA_BATCH_BUFFER * batch,
 }
 #endif
 STATUS
-mediadrv_gen_state_base_address_cmd_g8 (MEDIA_BATCH_BUFFER * batch,
-					STATE_BASE_ADDR_PARAMS * params)
+mediadrv_gen_state_base_address_cmd_g8(MEDIA_BATCH_BUFFER *batch,
+									   STATE_BASE_ADDR_PARAMS *params)
 {
-  STATUS status = SUCCESS;
-  BEGIN_BATCH (batch, 16);
-  OUT_BATCH (batch, (CMD_STATE_BASE_ADDRESS | (16 - 2)));
-  OUT_BATCH (batch, 0 | BASE_ADDRESS_MODIFY);	//General State Base Address
-  OUT_BATCH (batch, 0);
-  OUT_BATCH (batch, 0);
-  /*DW4 Surface state base address */
-  if (params->surface_state.bo)
-    {
-      OUT_RELOC (batch, params->surface_state.bo, I915_GEM_DOMAIN_INSTRUCTION, 0, BASE_ADDRESS_MODIFY);	/* Surface state base address */
-      OUT_BATCH (batch, 0);
-    }
-  else
-    {
-      OUT_BATCH (batch, 0 /*| BASE_ADDRESS_MODIFY */ );
-      OUT_BATCH (batch, 0);
-    }
-  /*DW6. Dynamic state base address */
-  if (params->dynamic_state.bo)
-    {
-      OUT_RELOC (batch, params->dynamic_state.bo,
-		 I915_GEM_DOMAIN_RENDER | I915_GEM_DOMAIN_SAMPLER,
-		 0, BASE_ADDRESS_MODIFY);
-      OUT_BATCH (batch, 0);
-    }
-  else
-    {
-      OUT_BATCH (batch, 0 /*| BASE_ADDRESS_MODIFY */ );
-      OUT_BATCH (batch, 0);
-    }
-  /*DW8. Indirect Object base address */
-  if (params->indirect_object.bo)
-    {
-      OUT_RELOC (batch, params->indirect_object.bo,
-		 I915_GEM_DOMAIN_SAMPLER, 0, BASE_ADDRESS_MODIFY);
-      OUT_BATCH (batch, 0);
-    }
-  else
-    {
-      OUT_BATCH (batch, 0 /*| BASE_ADDRESS_MODIFY */ );
-      OUT_BATCH (batch, 0);
-    }
-  /*DW10. Instruct base address */
-  if (params->instruction_buffer.bo)
-    {
-      OUT_RELOC (batch, params->instruction_buffer.bo,
-		 I915_GEM_DOMAIN_INSTRUCTION, 0, BASE_ADDRESS_MODIFY);
-      OUT_BATCH (batch, 0);
-    }
-  else
-    {
-      OUT_BATCH (batch, 0 | BASE_ADDRESS_MODIFY);
-      OUT_BATCH (batch, 0);
-    }
-  /* DW12. Size limitation */
-  OUT_BATCH (batch, 0xFFFFF000 | BASE_ADDRESS_MODIFY);	//General State Access Upper Bound
-  OUT_BATCH (batch, 0xFFFFF000 | BASE_ADDRESS_MODIFY);	//Dynamic State Access Upper Bound
-  OUT_BATCH (batch, 0xFFFFF000 | BASE_ADDRESS_MODIFY);	//Indirect Object Access Upper Bound
-  OUT_BATCH (batch, 0xFFFFF000 | BASE_ADDRESS_MODIFY);	//Instruction Access Upper Bound
-  //OUT_BATCH (batch, 0 /*| BASE_ADDRESS_MODIFY*/);
-  //OUT_BATCH (batch, 0 /*| BASE_ADDRESS_MODIFY*/);
-  ADVANCE_BATCH (batch);
-  return status;
+	STATUS status = SUCCESS;
+	BEGIN_BATCH(batch, 16);
+	OUT_BATCH(batch, (CMD_STATE_BASE_ADDRESS | (16 - 2)));
+	OUT_BATCH(batch, 0 | BASE_ADDRESS_MODIFY); // General State Base Address
+	OUT_BATCH(batch, 0);
+	OUT_BATCH(batch, 0);
+	/*DW4 Surface state base address */
+	if (params->surface_state.bo)
+	{
+		OUT_RELOC(batch, params->surface_state.bo, I915_GEM_DOMAIN_INSTRUCTION, 0, BASE_ADDRESS_MODIFY); /* Surface state base address */
+		OUT_BATCH(batch, 0);
+	}
+	else
+	{
+		OUT_BATCH(batch, 0 /*| BASE_ADDRESS_MODIFY */);
+		OUT_BATCH(batch, 0);
+	}
+	/*DW6. Dynamic state base address */
+	if (params->dynamic_state.bo)
+	{
+		OUT_RELOC(batch, params->dynamic_state.bo,
+				  I915_GEM_DOMAIN_RENDER | I915_GEM_DOMAIN_SAMPLER,
+				  0, BASE_ADDRESS_MODIFY);
+		OUT_BATCH(batch, 0);
+	}
+	else
+	{
+		OUT_BATCH(batch, 0 /*| BASE_ADDRESS_MODIFY */);
+		OUT_BATCH(batch, 0);
+	}
+	/*DW8. Indirect Object base address */
+	if (params->indirect_object.bo)
+	{
+		OUT_RELOC(batch, params->indirect_object.bo,
+				  I915_GEM_DOMAIN_SAMPLER, 0, BASE_ADDRESS_MODIFY);
+		OUT_BATCH(batch, 0);
+	}
+	else
+	{
+		OUT_BATCH(batch, 0 /*| BASE_ADDRESS_MODIFY */);
+		OUT_BATCH(batch, 0);
+	}
+	/*DW10. Instruct base address */
+	if (params->instruction_buffer.bo)
+	{
+		OUT_RELOC(batch, params->instruction_buffer.bo,
+				  I915_GEM_DOMAIN_INSTRUCTION, 0, BASE_ADDRESS_MODIFY);
+		OUT_BATCH(batch, 0);
+	}
+	else
+	{
+		OUT_BATCH(batch, 0 | BASE_ADDRESS_MODIFY);
+		OUT_BATCH(batch, 0);
+	}
+	/* DW12. Size limitation */
+	OUT_BATCH(batch, 0xFFFFF000 | BASE_ADDRESS_MODIFY); // General State Access Upper Bound
+	OUT_BATCH(batch, 0xFFFFF000 | BASE_ADDRESS_MODIFY); // Dynamic State Access Upper Bound
+	OUT_BATCH(batch, 0xFFFFF000 | BASE_ADDRESS_MODIFY); // Indirect Object Access Upper Bound
+	OUT_BATCH(batch, 0xFFFFF000 | BASE_ADDRESS_MODIFY); // Instruction Access Upper Bound
+	// OUT_BATCH (batch, 0 /*| BASE_ADDRESS_MODIFY*/);
+	// OUT_BATCH (batch, 0 /*| BASE_ADDRESS_MODIFY*/);
+	ADVANCE_BATCH(batch);
+	return status;
 }
 
 STATUS
-mediadrv_gen_media_vfe_state_cmd_g8 (MEDIA_BATCH_BUFFER * batch,
-				     VFE_STATE_PARAMS * params)
+mediadrv_gen_media_vfe_state_cmd_g8(MEDIA_BATCH_BUFFER *batch,
+									VFE_STATE_PARAMS *params)
 {
-  STATUS status = SUCCESS;
-  BEGIN_BATCH (batch, 9);
-  OUT_BATCH (batch, CMD_MEDIA_VFE_STATE | (9 - 2));
-  OUT_BATCH (batch, 0);		/* Scratch Space Base Pointer and Space */
-  OUT_BATCH (batch, 0);		//Scratch Space Base Pointer High
-  OUT_BATCH (batch, params->max_num_threads << 16 |	/* Maximum Number of Threads */
-	     params->num_urb_entries << 8 |	/* Number of URB Entries */
-	     params->gpgpu_mode << 2);	/* MEDIA Mode */
-  OUT_BATCH (batch, 0);		/* Debug: Object ID */
-  OUT_BATCH (batch, params->urb_entry_size << 16 |	/* URB Entry Allocation Size */
-	     params->curbe_allocation_size);	/* CURBE Allocation Size */
-  /* the vfe_desc5/6/7 will decide whether the scoreboard is used. */
-  if (params->scoreboard_enable)
-    {
-      OUT_BATCH (batch, params->scoreboardDW5);
-      OUT_BATCH (batch, params->scoreboardDW6);
-      OUT_BATCH (batch, params->scoreboardDW7);
-    }
-  else
-    {
-      OUT_BATCH (batch, 0);
-      OUT_BATCH (batch, 0);
-      OUT_BATCH (batch, 0);
-    }
-  ADVANCE_BATCH (batch);
-  return status;
-
+	STATUS status = SUCCESS;
+	BEGIN_BATCH(batch, 9);
+	OUT_BATCH(batch, CMD_MEDIA_VFE_STATE | (9 - 2));
+	OUT_BATCH(batch, 0);								 /* Scratch Space Base Pointer and Space */
+	OUT_BATCH(batch, 0);								 // Scratch Space Base Pointer High
+	OUT_BATCH(batch, params->max_num_threads << 16 |	 /* Maximum Number of Threads */
+						 params->num_urb_entries << 8 |	 /* Number of URB Entries */
+						 params->gpgpu_mode << 2);		 /* MEDIA Mode */
+	OUT_BATCH(batch, 0);								 /* Debug: Object ID */
+	OUT_BATCH(batch, params->urb_entry_size << 16 |		 /* URB Entry Allocation Size */
+						 params->curbe_allocation_size); /* CURBE Allocation Size */
+	/* the vfe_desc5/6/7 will decide whether the scoreboard is used. */
+	if (params->scoreboard_enable)
+	{
+		OUT_BATCH(batch, params->scoreboardDW5);
+		OUT_BATCH(batch, params->scoreboardDW6);
+		OUT_BATCH(batch, params->scoreboardDW7);
+	}
+	else
+	{
+		OUT_BATCH(batch, 0);
+		OUT_BATCH(batch, 0);
+		OUT_BATCH(batch, 0);
+	}
+	ADVANCE_BATCH(batch);
+	return status;
 }
 
 #if 0

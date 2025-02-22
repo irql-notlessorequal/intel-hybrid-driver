@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -34,19 +34,19 @@
 #include "intel_hybrid_common_vp9.h"
 
 VAStatus Intel_HostvldVp9_ParseCompressedHeader(
-    PINTEL_HOSTVLD_VP9_FRAME_STATE   pFrameState);
+	PINTEL_HOSTVLD_VP9_FRAME_STATE   pFrameState);
 
 VAStatus Intel_HostvldVp9_ParseTiles(
-    PINTEL_HOSTVLD_VP9_FRAME_STATE   pFrameState);
+	PINTEL_HOSTVLD_VP9_FRAME_STATE   pFrameState);
 
 VAStatus Intel_HostvldVp9_PreParseTiles(
-    PINTEL_HOSTVLD_VP9_FRAME_STATE   pFrameState);
+	PINTEL_HOSTVLD_VP9_FRAME_STATE   pFrameState);
 
 VAStatus Intel_HostvldVp9_ParseTileColumn(
-    PINTEL_HOSTVLD_VP9_TILE_STATE   pTileState, 
-    DWORD                              dwTileX);
+	PINTEL_HOSTVLD_VP9_TILE_STATE   pTileState, 
+	DWORD                              dwTileX);
 
 VAStatus Intel_HostvldVp9_PostParseTiles(
-    PINTEL_HOSTVLD_VP9_FRAME_STATE   pFrameState);
+	PINTEL_HOSTVLD_VP9_FRAME_STATE   pFrameState);
 
 #endif // __INTEL_HOSTVLD_VP9_PARSER_H__

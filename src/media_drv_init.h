@@ -1,5 +1,5 @@
 /*
- * Copyright ©  2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -38,13 +38,13 @@
 #include <va/va_drmcommon.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include <drm.h>
 #include <i915_drm.h>
 #include <intel_bufmgr.h>
-
 
 #ifdef __cplusplus
 }
@@ -56,15 +56,14 @@ extern "C" {
 #include "media_drv_render.h"
 #include "media_drv_hw.h"
 
-#define I965_PACKED_HEADER_BASE         0
-#define I965_PACKED_MISC_HEADER_BASE    3
+#define I965_PACKED_HEADER_BASE 0
+#define I965_PACKED_MISC_HEADER_BASE 3
 
 #define NEW_CONFIG_ID() object_heap_allocate(&drv_ctx->config_heap);
 #define CONFIG(id) ((struct object_config *)object_heap_lookup(&drv_ctx->config_heap, id))
 
 #define NEW_CONTEXT_ID() object_heap_allocate(&drv_ctx->context_heap);
 #define CONTEXT(id) ((struct object_context *)object_heap_lookup(&drv_ctx->context_heap, id))
-
 
 #define NEW_BUFFER_ID() object_heap_allocate(&drv_ctx->buffer_heap);
 #define BUFFER(id) ((struct object_buffer *)object_heap_lookup(&drv_ctx->buffer_heap, id))
@@ -77,231 +76,228 @@ extern "C" {
 
 struct coded_buffer_segment
 {
-  VACodedBufferSegment base;
-  BYTE mapped;
-  BYTE codec;
+	VACodedBufferSegment base;
+	BYTE mapped;
+	BYTE codec;
 };
 
-#define I965_CODEDBUFFER_HEADER_SIZE   ALIGN(sizeof(struct coded_buffer_segment), 64)
+#define I965_CODEDBUFFER_HEADER_SIZE ALIGN(sizeof(struct coded_buffer_segment), 64)
 struct object_buffer
 {
-  struct object_base base;
-  struct buffer_store *buffer_store;
-  INT max_num_elements;
-  INT num_elements;
-  INT size_element;
-  VABufferType type;
-  unsigned int export_refcount;
-#if VA_CHECK_VERSION(0,36,0)
-  VABufferInfo export_state;
+	struct object_base base;
+	struct buffer_store *buffer_store;
+	INT max_num_elements;
+	INT num_elements;
+	INT size_element;
+	VABufferType type;
+	unsigned int export_refcount;
+#if VA_CHECK_VERSION(0, 36, 0)
+	VABufferInfo export_state;
 #endif
 };
 struct buffer_store
 {
-  BYTE *buffer;
-  dri_bo *bo;
-  INT ref_count;
-  INT num_elements;
+	BYTE *buffer;
+	dri_bo *bo;
+	INT ref_count;
+	INT num_elements;
 };
 
 struct object_subpic
 {
-  struct object_base base;
-  VAImageID image;
-  struct object_image *obj_image;
-  VARectangle src_rect;
-  VARectangle dst_rect;
-  unsigned int format;
-  int width;
-  int height;
-  int pitch;
-  float global_alpha;
-  dri_bo *bo;
-  unsigned int flags;
+	struct object_base base;
+	VAImageID image;
+	struct object_image *obj_image;
+	VARectangle src_rect;
+	VARectangle dst_rect;
+	unsigned int format;
+	int width;
+	int height;
+	int pitch;
+	float global_alpha;
+	dri_bo *bo;
+	unsigned int flags;
 };
 
 struct object_image
 {
-  struct object_base base;
-  VAImage image;
-  dri_bo *bo;
-  UINT *palette;
-  VASurfaceID derived_surface;
+	struct object_base base;
+	VAImage image;
+	dri_bo *bo;
+	UINT *palette;
+	VASurfaceID derived_surface;
 };
 struct encode_state
 {
-  struct buffer_store *seq_param;
-  struct buffer_store *pic_param;
-  struct buffer_store *pic_control;
-  struct buffer_store *iq_matrix;
-  struct buffer_store *q_matrix;
-  struct buffer_store **slice_params;
-  INT max_slice_params;
-  INT num_slice_params;
-  /* for ext */
-  struct buffer_store *seq_param_ext;
-  struct buffer_store *pic_param_ext;
-  struct buffer_store *packed_header_param[4];
-  struct buffer_store *packed_header_data[4];
-  struct buffer_store **slice_params_ext;
-  INT max_slice_params_ext;
-  INT num_slice_params_ext;
-  INT last_packed_header_type;
-  struct buffer_store *misc_param[16];
-  VASurfaceID current_render_target;
-  struct object_surface *input_yuv_object;
-  struct object_surface *reconstructed_object;
-  struct object_surface *coded_buf_surface;
-  struct object_surface *reference_objects[16];	/* Up to 2 reference surfaces are valid for MPEG-2, */
-  //vp8
-  struct object_surface *ref_last_frame;
-  struct object_surface *ref_gf_frame;
-  struct object_surface *ref_arf_frame;
-  UINT mv_offset;
-  BOOL hme_enabled;
-  BOOL me_16x_enabled;
-  BOOL hme_done;
-  BOOL me_16x_done;
-  struct buffer_store *frame_update_param;
+	struct buffer_store *seq_param;
+	struct buffer_store *pic_param;
+	struct buffer_store *pic_control;
+	struct buffer_store *iq_matrix;
+	struct buffer_store *q_matrix;
+	struct buffer_store **slice_params;
+	INT max_slice_params;
+	INT num_slice_params;
+	/* for ext */
+	struct buffer_store *seq_param_ext;
+	struct buffer_store *pic_param_ext;
+	struct buffer_store *packed_header_param[4];
+	struct buffer_store *packed_header_data[4];
+	struct buffer_store **slice_params_ext;
+	INT max_slice_params_ext;
+	INT num_slice_params_ext;
+	INT last_packed_header_type;
+	struct buffer_store *misc_param[16];
+	VASurfaceID current_render_target;
+	struct object_surface *input_yuv_object;
+	struct object_surface *reconstructed_object;
+	struct object_surface *coded_buf_surface;
+	struct object_surface *reference_objects[16]; /* Up to 2 reference surfaces are valid for MPEG-2, */
+	// vp8
+	struct object_surface *ref_last_frame;
+	struct object_surface *ref_gf_frame;
+	struct object_surface *ref_arf_frame;
+	UINT mv_offset;
+	BOOL hme_enabled;
+	BOOL me_16x_enabled;
+	BOOL hme_done;
+	BOOL me_16x_done;
+	struct buffer_store *frame_update_param;
 };
-
 
 struct decode_state
 {
-  struct buffer_store *pic_param;
-  struct buffer_store **slice_params;
-  struct buffer_store *iq_matrix;
-  struct buffer_store *bit_plane;
-  struct buffer_store *huffman_table;
-  struct buffer_store **slice_datas;
-  struct buffer_store *probability_data;
-  VASurfaceID current_render_target;
-  int max_slice_params;
-  int max_slice_datas;
-  int num_slice_params;
-  int num_slice_datas;
+	struct buffer_store *pic_param;
+	struct buffer_store **slice_params;
+	struct buffer_store *iq_matrix;
+	struct buffer_store *bit_plane;
+	struct buffer_store *huffman_table;
+	struct buffer_store **slice_datas;
+	struct buffer_store *probability_data;
+	VASurfaceID current_render_target;
+	int max_slice_params;
+	int max_slice_datas;
+	int num_slice_params;
+	int num_slice_datas;
 
-  struct object_surface *render_object;
-  struct object_surface *reference_objects[16];
+	struct object_surface *render_object;
+	struct object_surface *reference_objects[16];
 };
-
 
 union codec_state
 {
-  struct encode_state encode;
-  struct decode_state decode;
+	struct encode_state encode;
+	struct decode_state decode;
 };
 
 struct hw_context
 {
-  VAStatus (*run) (VADriverContextP ctx,
-		   VAProfile profile,
-		   union codec_state * codec_state,
-		   struct hw_context * hw_context);
-  VOID (*destroy) (VOID *);
-  struct intel_batchbuffer *batch;
+	VAStatus (*run)(VADriverContextP ctx,
+					VAProfile profile,
+					union codec_state *codec_state,
+					struct hw_context *hw_context);
+	VOID (*destroy)(VOID *);
+	struct intel_batchbuffer *batch;
 };
 
 struct object_context
 {
-  struct object_base base;
-  VAContextID context_id;
-  struct object_config *obj_config;
-  VASurfaceID *render_targets;	//input->encode, output->decode
-  INT num_render_targets;
-  INT picture_width;
-  INT picture_height;
-  INT flags;
-  INT codec_type;
-  union codec_state codec_state;
-  struct hw_context *hw_context;
+	struct object_base base;
+	VAContextID context_id;
+	struct object_config *obj_config;
+	VASurfaceID *render_targets; // input->encode, output->decode
+	INT num_render_targets;
+	INT picture_width;
+	INT picture_height;
+	INT flags;
+	INT codec_type;
+	union codec_state codec_state;
+	struct hw_context *hw_context;
 };
 
 struct object_config
 {
-  struct object_base base;
-  VAProfile profile;
-  VAEntrypoint entrypoint;
-  VAConfigAttrib attrib_list[MEDIA_GEN_MAX_CONFIG_ATTRIBUTES];
-  INT num_attribs;
+	struct object_base base;
+	VAProfile profile;
+	VAEntrypoint entrypoint;
+	VAConfigAttrib attrib_list[MEDIA_GEN_MAX_CONFIG_ATTRIBUTES];
+	INT num_attribs;
 };
 typedef struct _media_drv_context
 {
-  struct media_driver_data drv_data;
-  struct object_heap config_heap;
-  struct object_heap context_heap;
-  struct object_heap surface_heap;
-  struct object_heap buffer_heap;
-  struct object_heap subpic_heap;
-  struct object_heap image_heap;
-  struct hw_codec_info *codec_info;
-  INT locked;
-  MEDIA_DRV_MUTEX ctxmutex;
-  MEDIA_BATCH_BUFFER *batch;
-  MEDIA_BATCH_BUFFER *pp_batch;
-  MEDIA_BATCH_BUFFER *render_batch;
-  MEDIA_DRV_MUTEX render_mutex;
-  MEDIA_DRV_MUTEX pp_mutex;
-  CHAR va_vendor[256];
-  //display attributes
-  VADisplayAttribute *display_attributes;
-  UINT num_display_attributes;
-  VADisplayAttribute *rotation_attrib;
-  VADisplayAttribute *brightness_attrib;
-  VADisplayAttribute *contrast_attrib;
-  VADisplayAttribute *hue_attrib;
-  VADisplayAttribute *saturation_attrib;
-  VAContextID current_context_id;
-  struct media_render_state render_state;
-  struct va_dri_output *dri_output;
-  MEDIA_HW_CONTEXT hw_context;
+	struct media_driver_data drv_data;
+	struct object_heap config_heap;
+	struct object_heap context_heap;
+	struct object_heap surface_heap;
+	struct object_heap buffer_heap;
+	struct object_heap subpic_heap;
+	struct object_heap image_heap;
+	struct hw_codec_info *codec_info;
+	INT locked;
+	MEDIA_DRV_MUTEX ctxmutex;
+	MEDIA_BATCH_BUFFER *batch;
+	MEDIA_BATCH_BUFFER *pp_batch;
+	MEDIA_BATCH_BUFFER *render_batch;
+	MEDIA_DRV_MUTEX render_mutex;
+	MEDIA_DRV_MUTEX pp_mutex;
+	CHAR va_vendor[256];
+	// display attributes
+	VADisplayAttribute *display_attributes;
+	UINT num_display_attributes;
+	VADisplayAttribute *rotation_attrib;
+	VADisplayAttribute *brightness_attrib;
+	VADisplayAttribute *contrast_attrib;
+	VADisplayAttribute *hue_attrib;
+	VADisplayAttribute *saturation_attrib;
+	VAContextID current_context_id;
+	struct media_render_state render_state;
+	struct va_dri_output *dri_output;
+	MEDIA_HW_CONTEXT hw_context;
 
-  void *wrapper_ctx;
+	void *wrapper_ctx;
 } MEDIA_DRV_CONTEXT;
 
 typedef struct _config_attr_list
 {
 
-  VAProfile profile;
-  VAEntrypoint entrypoint;
-  UINT ratectrl_method;
-  UINT dec_slice_mode;
+	VAProfile profile;
+	VAEntrypoint entrypoint;
+	UINT ratectrl_method;
+	UINT dec_slice_mode;
 } config_attr_list;
 
-VOID media_destroy_image (struct object_heap *heap, struct object_base *obj);
+VOID media_destroy_image(struct object_heap *heap, struct object_base *obj);
 VAStatus
-media_DestroySurfaces (VADriverContextP ctx,
-		       VASurfaceID * surface_list, INT num_surfaces);
+media_DestroySurfaces(VADriverContextP ctx,
+					  VASurfaceID *surface_list, INT num_surfaces);
 VAStatus
-media_CreateSurfaces (VADriverContextP ctx,
-		      INT width, INT height, INT format, INT num_surfaces, VASurfaceID * surfaces);
+media_CreateSurfaces(VADriverContextP ctx,
+					 INT width, INT height, INT format, INT num_surfaces, VASurfaceID *surfaces);
 
 VAStatus
-media_MapBuffer (VADriverContextP ctx, VABufferID buf_id, /* in */
-     VOID ** pbuf);  /* out */
+media_MapBuffer(VADriverContextP ctx, VABufferID buf_id, /* in */
+				VOID **pbuf);							 /* out */
 VAStatus
-media_UnmapBuffer (VADriverContextP ctx, VABufferID buf_id);
+media_UnmapBuffer(VADriverContextP ctx, VABufferID buf_id);
 
 VAStatus
 vawr_DeriveBuffer(VADriverContextP ctx,
-            VABufferType type,
-            UINT size,
-            UINT num_elements,
-            VOID * data,
-            VABufferInfo *buf_info, VABufferID *buf_id);
+				  VABufferType type,
+				  UINT size,
+				  UINT num_elements,
+				  VOID *data,
+				  VABufferInfo *buf_info, VABufferID *buf_id);
 
 VAStatus
 vawr_DestroyBuffer(VADriverContextP ctx, VABufferID buf_id);
-
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-  __attribute__ ((visibility ("default"))) VAStatus
-    hybridQueryBufferAttributes (VADisplay dpy, VAContextID context,
-				 VABufferType bufferType, VOID * outputData,
-				 UINT * outputDataLen);
+	__attribute__((visibility("default"))) VAStatus
+	hybridQueryBufferAttributes(VADisplay dpy, VAContextID context,
+								VABufferType bufferType, VOID *outputData,
+								UINT *outputDataLen);
 
 #ifdef __cplusplus
 }

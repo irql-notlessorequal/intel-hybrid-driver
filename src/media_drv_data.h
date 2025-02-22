@@ -1,5 +1,5 @@
 /*
- * Copyright ©  2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -81,67 +81,67 @@ struct media_interface_descriptor_data
 {
   struct
   {
-    UINT pad0:6;
-    UINT kernel_start_pointer:26;
+	UINT pad0:6;
+	UINT kernel_start_pointer:26;
   } desc0;
 
   struct
   {
-    UINT kernel_start_pointer_high:16;
-    UINT pad0:16;
+	UINT kernel_start_pointer_high:16;
+	UINT pad0:16;
   } desc1;
 
   struct
   {
-    UINT pad0:7;
-    UINT software_exception_enable:1;
-    UINT pad1:3;
-    UINT maskstack_exception_enable:1;
-    UINT pad2:1;
-    UINT illegal_opcode_exception_enable:1;
-    UINT pad3:2;
-    UINT floating_point_mode:1;
-    UINT thread_priority:1;
-    UINT single_program_flow:1;
-    UINT denorm_mode:1;
-    UINT pad4:12;
+	UINT pad0:7;
+	UINT software_exception_enable:1;
+	UINT pad1:3;
+	UINT maskstack_exception_enable:1;
+	UINT pad2:1;
+	UINT illegal_opcode_exception_enable:1;
+	UINT pad3:2;
+	UINT floating_point_mode:1;
+	UINT thread_priority:1;
+	UINT single_program_flow:1;
+	UINT denorm_mode:1;
+	UINT pad4:12;
   } desc2;
 
   struct
   {
-    UINT pad0:2;
-    UINT sampler_count:3;
-    UINT sampler_state_pointer:27;
+	UINT pad0:2;
+	UINT sampler_count:3;
+	UINT sampler_state_pointer:27;
   } desc3;
 
   struct
   {
-    UINT binding_table_entry_count:5;
-    UINT binding_table_pointer:11;
-    UINT pad0:16;
+	UINT binding_table_entry_count:5;
+	UINT binding_table_pointer:11;
+	UINT pad0:16;
   } desc4;
 
   struct
   {
-    UINT constant_urb_entry_read_offset:16;
-    UINT constant_urb_entry_read_length:16;
+	UINT constant_urb_entry_read_offset:16;
+	UINT constant_urb_entry_read_length:16;
   } desc5;
 
   struct
   {
-    UINT num_threads_in_tg:10;
-    UINT pad0:5;
-    UINT global_barrier_enable:1;
-    UINT shared_local_memory_size:5;
-    UINT barrier_enable:1;
-    UINT rounding_mode:2;
-    UINT pad1:8;
+	UINT num_threads_in_tg:10;
+	UINT pad0:5;
+	UINT global_barrier_enable:1;
+	UINT shared_local_memory_size:5;
+	UINT barrier_enable:1;
+	UINT rounding_mode:2;
+	UINT pad1:8;
   } desc6;
 
   struct
   {
-    UINT cross_thread_constant_data_read_length:8;
-    UINT pad0:24;
+	UINT cross_thread_constant_data_read_length:8;
+	UINT pad0:24;
   } desc7;
 };
 
@@ -149,72 +149,72 @@ struct gen6_interface_descriptor_data
 {
   struct
   {
-    UINT pad0:6;
-    UINT kernel_start_pointer:26;
+	UINT pad0:6;
+	UINT kernel_start_pointer:26;
   } desc0;
 
   struct
   {
-    UINT pad0:7;
-    UINT software_exception_enable:1;
-    UINT pad1:3;
-    UINT maskstack_exception_enable:1;
-    UINT pad2:1;
-    UINT illegal_opcode_exception_enable:1;
-    UINT pad3:2;
-    UINT floating_point_mode:1;
-    UINT thread_priority:1;
-    UINT single_program_flow:1;
-    UINT pad4:13;
+	UINT pad0:7;
+	UINT software_exception_enable:1;
+	UINT pad1:3;
+	UINT maskstack_exception_enable:1;
+	UINT pad2:1;
+	UINT illegal_opcode_exception_enable:1;
+	UINT pad3:2;
+	UINT floating_point_mode:1;
+	UINT thread_priority:1;
+	UINT single_program_flow:1;
+	UINT pad4:13;
   } desc1;
 
   struct
   {
-    UINT pad0:2;
-    UINT sampler_count:3;
-    UINT sampler_state_pointer:27;
+	UINT pad0:2;
+	UINT sampler_count:3;
+	UINT sampler_state_pointer:27;
   } desc2;
 
   struct
   {
-    UINT binding_table_entry_count:5;
-    UINT binding_table_pointer:27;
+	UINT binding_table_entry_count:5;
+	UINT binding_table_pointer:27;
   } desc3;
 
   struct
   {
-    UINT constant_urb_entry_read_offset:16;
-    UINT constant_urb_entry_read_length:16;
+	UINT constant_urb_entry_read_offset:16;
+	UINT constant_urb_entry_read_length:16;
   } desc4;
 
   union
   {
-    struct
-    {
-      UINT num_threads:8;
-      UINT barrier_return_byte:8;
-      UINT shared_local_memory_size:5;
-      UINT barrier_enable:1;
-      UINT rounding_mode:2;
-      UINT barrier_return_grf_offset:8;
-    } gen7;
+	struct
+	{
+	  UINT num_threads:8;
+	  UINT barrier_return_byte:8;
+	  UINT shared_local_memory_size:5;
+	  UINT barrier_enable:1;
+	  UINT rounding_mode:2;
+	  UINT barrier_return_grf_offset:8;
+	} gen7;
 
-    struct
-    {
-      UINT barrier_id:4;
-      UINT pad0:28;
-    } gen6;
+	struct
+	{
+	  UINT barrier_id:4;
+	  UINT pad0:28;
+	} gen6;
   } desc5;
 
   struct
   {
-    UINT cross_thread_constant_data_read_length:8;
-    UINT pad0:24;
+	UINT cross_thread_constant_data_read_length:8;
+	UINT pad0:24;
   } desc6;
 
   struct
   {
-    UINT pad0;
+	UINT pad0;
   } desc7;
 };
 #endif

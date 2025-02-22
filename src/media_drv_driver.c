@@ -1,5 +1,5 @@
 /*
- * Copyright ©  2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -46,12 +46,12 @@ media_drv_intel_bufmgr_init (MEDIA_DRV_CONTEXT * drv_ctx)
 {
   BOOL status = SUCCESS;
   drv_ctx->drv_data.bufmgr =
-    intel_bufmgr_gem_init (drv_ctx->drv_data.fd, BATCH_BUF_SIZE);
+	intel_bufmgr_gem_init (drv_ctx->drv_data.fd, BATCH_BUF_SIZE);
   if (drv_ctx->drv_data.bufmgr == NULL)
-    {
-      //MEDIA_DRV_ASSERT (drv_ctx->bufmgr);
-      return FAILED;
-    }
+	{
+	  //MEDIA_DRV_ASSERT (drv_ctx->bufmgr);
+	  return FAILED;
+	}
   intel_bufmgr_gem_enable_reuse (drv_ctx->drv_data.bufmgr);
   return status;
 }
@@ -72,17 +72,17 @@ media_driver_get_revid (INT * value)
   fp = fopen ("/sys/devices/pci0000:00/0000:00:02.0/config", "r");
 
   if (fp)
-    {
-      if (fread (config_data, 1, 16, fp))
+	{
+	  if (fread (config_data, 1, 16, fp))
 	*value = config_data[PCI_REVID];
-      else
+	  else
 	*value = 2;		/* assume it is at least  B-steping */
-      fclose (fp);
-    }
+	  fclose (fp);
+	}
   else
-    {
-      *value = 2;		/* assume it is at least  B-steping */
-    }
+	{
+	  *value = 2;		/* assume it is at least  B-steping */
+	}
 
   return;
 }
@@ -95,7 +95,7 @@ media_drv_get_param (MEDIA_DRV_CONTEXT * drv_ctx, INT param, INT * value)
   gp.param = param;
   gp.value = value;
   return drmCommandWriteRead (drv_ctx->drv_data.fd, DRM_I915_GETPARAM, &gp,
-			      sizeof (gp)) == 0;
+				  sizeof (gp)) == 0;
 
 }
 
@@ -110,46 +110,46 @@ media_driver_init (VADriverContextP ctx)
   drv_ctx = ctx->pDriverData;
   MEDIA_DRV_ASSERT (drm_state);
   MEDIA_DRV_ASSERT (VA_CHECK_DRM_AUTH_TYPE (ctx, VA_DRM_AUTH_DRI1) ||
-		    VA_CHECK_DRM_AUTH_TYPE (ctx, VA_DRM_AUTH_DRI2) ||
-		    VA_CHECK_DRM_AUTH_TYPE (ctx, VA_DRM_AUTH_CUSTOM));
+			VA_CHECK_DRM_AUTH_TYPE (ctx, VA_DRM_AUTH_DRI2) ||
+			VA_CHECK_DRM_AUTH_TYPE (ctx, VA_DRM_AUTH_CUSTOM));
 
   {
-    char *env_str;
-    g_intel_debug_option_flags = 0;
-    if ((env_str = getenv("VA_INTEL_DEBUG"))) {
-      char *debug_ptr = NULL;
-      debug_ptr = strstr(env_str, "0x");
-      if (debug_ptr) {
-        g_intel_debug_option_flags = strtoul(debug_ptr, NULL, 16);
-      } else {
-        g_intel_debug_option_flags = atoi(env_str);
-      }
-    }
+	char *env_str;
+	g_intel_debug_option_flags = 0;
+	if ((env_str = getenv("VA_INTEL_DEBUG"))) {
+	  char *debug_ptr = NULL;
+	  debug_ptr = strstr(env_str, "0x");
+	  if (debug_ptr) {
+		g_intel_debug_option_flags = strtoul(debug_ptr, NULL, 16);
+	  } else {
+		g_intel_debug_option_flags = atoi(env_str);
+	  }
+	}
   }
 
   drv_ctx->drv_data.fd = drm_state->fd;
   drv_ctx->drv_data.dri2_enabled =
-    (VA_CHECK_DRM_AUTH_TYPE (ctx, VA_DRM_AUTH_DRI2)
-     || VA_CHECK_DRM_AUTH_TYPE (ctx, VA_DRM_AUTH_CUSTOM));
+	(VA_CHECK_DRM_AUTH_TYPE (ctx, VA_DRM_AUTH_DRI2)
+	 || VA_CHECK_DRM_AUTH_TYPE (ctx, VA_DRM_AUTH_CUSTOM));
 
   if (!drv_ctx->drv_data.dri2_enabled)
-    {
-      return FALSE;
-    }
+	{
+	  return FALSE;
+	}
 
   drv_ctx->locked = 0;
   media_drv_mutex_init (&drv_ctx->ctxmutex);
 
   media_drv_get_param (drv_ctx, I915_PARAM_CHIPSET_ID,
-		       &drv_ctx->drv_data.device_id);
+			   &drv_ctx->drv_data.device_id);
   if (media_drv_get_param (drv_ctx, I915_PARAM_HAS_EXECBUF2, &has_exec2))
-    drv_ctx->drv_data.exec2_flag = has_exec2;
+	drv_ctx->drv_data.exec2_flag = has_exec2;
   if (media_drv_get_param (drv_ctx, I915_PARAM_HAS_BSD, &has_bsd))
-    drv_ctx->drv_data.bsd_flag = has_bsd;
+	drv_ctx->drv_data.bsd_flag = has_bsd;
   if (media_drv_get_param (drv_ctx, I915_PARAM_HAS_BLT, &has_blt))
-    drv_ctx->drv_data.blt_flag = has_blt;
+	drv_ctx->drv_data.blt_flag = has_blt;
   if (media_drv_get_param (drv_ctx, I915_PARAM_HAS_VEBOX, &has_vebox))
-    drv_ctx->drv_data.vebox_flag = ! !has_vebox;
+	drv_ctx->drv_data.vebox_flag = ! !has_vebox;
 
   media_driver_get_revid (&drv_ctx->drv_data.revision);
   media_drv_intel_bufmgr_init (drv_ctx);
@@ -174,45 +174,45 @@ media_driver_data_init (VADriverContextP ctx)
   MEDIA_DRV_ASSERT (ctx);
   drv_ctx = ctx->pDriverData;
   if (IS_GEN75 (drv_ctx->drv_data.device_id))
-    drv_ctx->codec_info = &gen75_hw_codec_info;
+	drv_ctx->codec_info = &gen75_hw_codec_info;
   else if (IS_GEN7 (drv_ctx->drv_data.device_id))
-    drv_ctx->codec_info = &gen7_hw_codec_info;
+	drv_ctx->codec_info = &gen7_hw_codec_info;
   else if (IS_GEN8(drv_ctx->drv_data.device_id))
-    drv_ctx->codec_info = &gen8_hw_codec_info;
+	drv_ctx->codec_info = &gen8_hw_codec_info;
   else if (IS_CHERRYVIEW(drv_ctx->drv_data.device_id))
-    drv_ctx->codec_info = &chv_hw_codec_info;
+	drv_ctx->codec_info = &chv_hw_codec_info;
   else if (IS_GEN9(drv_ctx->drv_data.device_id))
-    drv_ctx->codec_info = &gen9_hw_codec_info;
+	drv_ctx->codec_info = &gen9_hw_codec_info;
   else
-    return false;
+	return false;
 
   if (object_heap_init (&drv_ctx->config_heap,
 			sizeof (struct object_config), CONFIG_ID_OFFSET))
-    goto err_config_heap;
+	goto err_config_heap;
   if (object_heap_init (&drv_ctx->context_heap,
 			sizeof (struct object_context), CONTEXT_ID_OFFSET))
-    goto err_context_heap;
+	goto err_context_heap;
 
   if (object_heap_init (&drv_ctx->surface_heap,
 			sizeof (struct object_surface), SURFACE_ID_OFFSET))
-    goto err_surface_heap;
+	goto err_surface_heap;
   if (object_heap_init (&drv_ctx->buffer_heap,
 			sizeof (struct object_buffer), BUFFER_ID_OFFSET))
-    goto err_buffer_heap;
+	goto err_buffer_heap;
   if (object_heap_init (&drv_ctx->image_heap,
 			sizeof (struct object_image), IMAGE_ID_OFFSET))
-    goto err_image_heap;
+	goto err_image_heap;
 
   if (object_heap_init (&drv_ctx->subpic_heap,
-                        sizeof (struct object_subpic), IMAGE_ID_OFFSET))
-    goto err_subpic_heap;
+						sizeof (struct object_subpic), IMAGE_ID_OFFSET))
+	goto err_subpic_heap;
 
   drv_ctx->batch =
-    media_batchbuffer_new (&drv_ctx->drv_data, I915_EXEC_RENDER, 0);
+	media_batchbuffer_new (&drv_ctx->drv_data, I915_EXEC_RENDER, 0);
   drv_ctx->pp_batch =
-    media_batchbuffer_new (&drv_ctx->drv_data, I915_EXEC_RENDER, 0);
+	media_batchbuffer_new (&drv_ctx->drv_data, I915_EXEC_RENDER, 0);
   drv_ctx->render_batch =
-    media_batchbuffer_new (&drv_ctx->drv_data, I915_EXEC_RENDER, 0);
+	media_batchbuffer_new (&drv_ctx->drv_data, I915_EXEC_RENDER, 0);
   media_drv_mutex_init (&drv_ctx->render_mutex);
   media_drv_mutex_init (&drv_ctx->pp_mutex);
 
@@ -239,20 +239,20 @@ media_release_buffer_store (struct buffer_store ** ptr)
   struct buffer_store *buffer_store = *ptr;
 
   if (buffer_store == NULL)
-    return;
+	return;
 
   MEDIA_DRV_ASSERT (buffer_store->bo || buffer_store->buffer);
   MEDIA_DRV_ASSERT (!(buffer_store->bo && buffer_store->buffer));
   buffer_store->ref_count--;
 
   if (buffer_store->ref_count == 0)
-    {
-      dri_bo_unreference (buffer_store->bo);
-      media_drv_free_memory (buffer_store->buffer);
-      buffer_store->bo = NULL;
-      buffer_store->buffer = NULL;
-      media_drv_free_memory (buffer_store);
-    }
+	{
+	  dri_bo_unreference (buffer_store->bo);
+	  media_drv_free_memory (buffer_store->buffer);
+	  buffer_store->bo = NULL;
+	  buffer_store->buffer = NULL;
+	  media_drv_free_memory (buffer_store);
+	}
 
   *ptr = NULL;
 }
@@ -264,76 +264,76 @@ media_destroy_context (struct object_heap *heap, struct object_base *obj)
   INT i;
 
   if (obj_context->hw_context)
-    {
-      obj_context->hw_context->destroy (obj_context->hw_context);
-      obj_context->hw_context = NULL;
-    }
+	{
+	  obj_context->hw_context->destroy (obj_context->hw_context);
+	  obj_context->hw_context = NULL;
+	}
 
   if (obj_context->codec_type == CODEC_ENC)
-    {
-      MEDIA_DRV_ASSERT (obj_context->codec_state.encode.num_slice_params <=
+	{
+	  MEDIA_DRV_ASSERT (obj_context->codec_state.encode.num_slice_params <=
 			obj_context->codec_state.encode.max_slice_params);
-      media_release_buffer_store (&obj_context->codec_state.encode.pic_param);
-      media_release_buffer_store (&obj_context->codec_state.encode.seq_param);
-      media_release_buffer_store (&obj_context->codec_state.encode.q_matrix);
-      for (i = 0; i < obj_context->codec_state.encode.num_slice_params; i++)
+	  media_release_buffer_store (&obj_context->codec_state.encode.pic_param);
+	  media_release_buffer_store (&obj_context->codec_state.encode.seq_param);
+	  media_release_buffer_store (&obj_context->codec_state.encode.q_matrix);
+	  for (i = 0; i < obj_context->codec_state.encode.num_slice_params; i++)
 	media_release_buffer_store (&obj_context->codec_state.encode.
-				    slice_params[i]);
+					slice_params[i]);
 
-      media_drv_free_memory (obj_context->codec_state.encode.slice_params);
+	  media_drv_free_memory (obj_context->codec_state.encode.slice_params);
 
-      MEDIA_DRV_ASSERT (obj_context->codec_state.encode.
+	  MEDIA_DRV_ASSERT (obj_context->codec_state.encode.
 			num_slice_params_ext <=
 			obj_context->codec_state.encode.max_slice_params_ext);
-      media_release_buffer_store (&obj_context->codec_state.encode.
+	  media_release_buffer_store (&obj_context->codec_state.encode.
 				  pic_param_ext);
-      media_release_buffer_store (&obj_context->codec_state.encode.
+	  media_release_buffer_store (&obj_context->codec_state.encode.
 				  seq_param_ext);
-      media_release_buffer_store (&obj_context->codec_state.
+	  media_release_buffer_store (&obj_context->codec_state.
 				  encode.frame_update_param);
 
-      for (i = 0;
+	  for (i = 0;
 	   i <
 	   ARRAY_ELEMS (obj_context->codec_state.encode.packed_header_param);
 	   i++)
 	media_release_buffer_store (&obj_context->codec_state.encode.
-				    packed_header_param[i]);
+					packed_header_param[i]);
 
-      for (i = 0;
+	  for (i = 0;
 	   i <
 	   ARRAY_ELEMS (obj_context->codec_state.encode.packed_header_data);
 	   i++)
 	media_release_buffer_store (&obj_context->codec_state.encode.
-				    packed_header_data[i]);
+					packed_header_data[i]);
 
-      for (i = 0;
+	  for (i = 0;
 	   i < ARRAY_ELEMS (obj_context->codec_state.encode.misc_param); i++)
 	media_release_buffer_store (&obj_context->codec_state.encode.
-				    misc_param[i]);
+					misc_param[i]);
 
-      for (i = 0; i < obj_context->codec_state.encode.num_slice_params_ext;
+	  for (i = 0; i < obj_context->codec_state.encode.num_slice_params_ext;
 	   i++)
 	media_release_buffer_store (&obj_context->codec_state.encode.
-				    slice_params_ext[i]);
+					slice_params_ext[i]);
 
-      media_drv_free_memory (obj_context->codec_state.encode.
-			     slice_params_ext);
-    }
-    else if (obj_context->codec_type == CODEC_DEC)
-    {
-      media_release_buffer_store(&obj_context->codec_state.decode.pic_param);
-      media_release_buffer_store(&obj_context->codec_state.decode.iq_matrix);
-      media_release_buffer_store(&obj_context->codec_state.decode.bit_plane);
-      media_release_buffer_store(&obj_context->codec_state.decode.huffman_table);
+	  media_drv_free_memory (obj_context->codec_state.encode.
+				 slice_params_ext);
+	}
+	else if (obj_context->codec_type == CODEC_DEC)
+	{
+	  media_release_buffer_store(&obj_context->codec_state.decode.pic_param);
+	  media_release_buffer_store(&obj_context->codec_state.decode.iq_matrix);
+	  media_release_buffer_store(&obj_context->codec_state.decode.bit_plane);
+	  media_release_buffer_store(&obj_context->codec_state.decode.huffman_table);
 
-      for (i = 0; i < obj_context->codec_state.decode.num_slice_params; i++) {
-        media_release_buffer_store(&obj_context->codec_state.decode.slice_params[i]);
-        media_release_buffer_store(&obj_context->codec_state.decode.slice_datas[i]);
-      }
+	  for (i = 0; i < obj_context->codec_state.decode.num_slice_params; i++) {
+		media_release_buffer_store(&obj_context->codec_state.decode.slice_params[i]);
+		media_release_buffer_store(&obj_context->codec_state.decode.slice_datas[i]);
+	  }
 
-      media_drv_free_memory (obj_context->codec_state.decode.slice_params);
-      media_drv_free_memory (obj_context->codec_state.decode.slice_datas);
-    }
+	  media_drv_free_memory (obj_context->codec_state.decode.slice_params);
+	  media_drv_free_memory (obj_context->codec_state.decode.slice_datas);
+	}
 
   media_drv_free_memory (obj_context->render_targets);
   object_heap_free (heap, obj);
@@ -347,7 +347,7 @@ media_destroy_config (struct object_heap *heap, struct object_base *obj)
 
 static VOID
 media_destroy_heap (struct object_heap *heap,
-		    VOID (*func) (struct object_heap * heap,
+			VOID (*func) (struct object_heap * heap,
 				  struct object_base * object))
 {
   struct object_base *object;
@@ -356,12 +356,12 @@ media_destroy_heap (struct object_heap *heap,
   object = object_heap_first (heap, &iter);
 
   while (object)
-    {
-      if (func)
+	{
+	  if (func)
 	func (heap, object);
 
-      object = object_heap_next (heap, &iter);
-    }
+	  object = object_heap_next (heap, &iter);
+	}
 
   object_heap_destroy (heap);
 }
@@ -394,13 +394,13 @@ media_driver_data_terminate (VADriverContextP ctx)
   media_drv_mutex_destroy (&drv_ctx->render_mutex);
 
   if (drv_ctx->batch)
-    media_batchbuffer_free (drv_ctx->batch);
+	media_batchbuffer_free (drv_ctx->batch);
 
   if (drv_ctx->pp_batch)
-    media_batchbuffer_free (drv_ctx->pp_batch);
+	media_batchbuffer_free (drv_ctx->pp_batch);
 
   if (drv_ctx->render_batch)
-    media_batchbuffer_free (drv_ctx->render_batch);
+	media_batchbuffer_free (drv_ctx->render_batch);
 
   media_destroy_heap (&drv_ctx->image_heap, media_destroy_image);
   media_destroy_heap (&drv_ctx->buffer_heap, media_destroy_buffer);

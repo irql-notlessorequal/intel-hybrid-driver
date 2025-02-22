@@ -1,5 +1,5 @@
 /*
- * Copyright ©  2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -33,26 +33,23 @@
 #include "media_drv_render.h"
 #include "media_drv_hw.h"
 
-BOOL
-media_render_init (VADriverContextP ctx)
+BOOL media_render_init(VADriverContextP ctx)
 {
-  MEDIA_DRV_CONTEXT *drv_ctx = ctx->pDriverData;
-  MEDIA_DRV_ASSERT (ctx);
+	MEDIA_DRV_CONTEXT *drv_ctx = ctx->pDriverData;
+	MEDIA_DRV_ASSERT(ctx);
 
-  if (drv_ctx->codec_info && drv_ctx->codec_info->render_init)
-    drv_ctx->codec_info->render_init(ctx);
+	if (drv_ctx->codec_info && drv_ctx->codec_info->render_init)
+		drv_ctx->codec_info->render_init(ctx);
 
-  return true;
+	return true;
 }
 
-VOID
-media_render_terminate (VADriverContextP ctx)
+VOID media_render_terminate(VADriverContextP ctx)
 {
-  MEDIA_DRV_CONTEXT *drv_ctx = ctx->pDriverData;
-  MEDIA_DRV_ASSERT (ctx);
-  struct media_render_state *render_state = &drv_ctx->render_state;
+	MEDIA_DRV_CONTEXT *drv_ctx = ctx->pDriverData;
+	MEDIA_DRV_ASSERT(ctx);
+	struct media_render_state *render_state = &drv_ctx->render_state;
 
-
-  if (render_state->render_terminate)
-    render_state->render_terminate(ctx);
+	if (render_state->render_terminate)
+		render_state->render_terminate(ctx);
 }

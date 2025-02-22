@@ -1,5 +1,5 @@
 /*
- * Copyright ©  2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -150,62 +150,62 @@
 #define IS_BAYTRAIL_M3(devid)    (devid == PCI_CHIP_BAYTRAIL_M_3)
 #define IS_BAYTRAIL_D(devid)     (devid == PCI_CHIP_BAYTRAIL_D)
 #define IS_BAYTRAIL(devid)       (IS_BAYTRAIL_M1(devid) || \
-                                  IS_BAYTRAIL_M2(devid) || \
-                                  IS_BAYTRAIL_M3(devid) || \
-                                  IS_BAYTRAIL_D(devid) )
+								  IS_BAYTRAIL_M2(devid) || \
+								  IS_BAYTRAIL_M3(devid) || \
+								  IS_BAYTRAIL_D(devid) )
 
 #define IS_IVB_GT1(devid)       (devid == PCI_CHIP_IVYBRIDGE_GT1 ||     \
-                                 devid == PCI_CHIP_IVYBRIDGE_M_GT1 ||   \
-                                 devid == PCI_CHIP_IVYBRIDGE_S_GT1)
+								 devid == PCI_CHIP_IVYBRIDGE_M_GT1 ||   \
+								 devid == PCI_CHIP_IVYBRIDGE_S_GT1)
 
 #define IS_IVB_GT2(devid)       (devid == PCI_CHIP_IVYBRIDGE_GT2 ||     \
-                                 devid == PCI_CHIP_IVYBRIDGE_M_GT2 ||   \
-                                 devid == PCI_CHIP_IVYBRIDGE_S_GT2)
+								 devid == PCI_CHIP_IVYBRIDGE_M_GT2 ||   \
+								 devid == PCI_CHIP_IVYBRIDGE_S_GT2)
 
 #define IS_IVYBRIDGE(devid)     (IS_IVB_GT1(devid) ||   \
-                                 IS_IVB_GT2(devid) ||   \
-                                 IS_BAYTRAIL(devid) )
+								 IS_IVB_GT2(devid) ||   \
+								 IS_BAYTRAIL(devid) )
 
 #define IS_HSW_GT1(devid)   	(devid == PCI_CHIP_HASWELL_GT1		|| \
-                                 devid == PCI_CHIP_HASWELL_M_GT1	|| \
-                                 devid == PCI_CHIP_HASWELL_S_GT1	|| \
+								 devid == PCI_CHIP_HASWELL_M_GT1	|| \
+								 devid == PCI_CHIP_HASWELL_S_GT1	|| \
 				 devid == PCI_CHIP_HASWELL_B_GT1        || \
 				 devid == PCI_CHIP_HASWELL_E_GT1        || \
-                                 devid == PCI_CHIP_HASWELL_SDV_GT1	|| \
-                                 devid == PCI_CHIP_HASWELL_SDV_M_GT1	|| \
-                                 devid == PCI_CHIP_HASWELL_SDV_S_GT1	|| \
+								 devid == PCI_CHIP_HASWELL_SDV_GT1	|| \
+								 devid == PCI_CHIP_HASWELL_SDV_M_GT1	|| \
+								 devid == PCI_CHIP_HASWELL_SDV_S_GT1	|| \
 				 devid == PCI_CHIP_HASWELL_SDV_B_GT1    || \
 				 devid == PCI_CHIP_HASWELL_SDV_E_GT1    || \
-                                 devid == PCI_CHIP_HASWELL_CRW_GT1	|| \
-                                 devid == PCI_CHIP_HASWELL_CRW_M_GT1	|| \
-                                 devid == PCI_CHIP_HASWELL_CRW_S_GT1    || \
+								 devid == PCI_CHIP_HASWELL_CRW_GT1	|| \
+								 devid == PCI_CHIP_HASWELL_CRW_M_GT1	|| \
+								 devid == PCI_CHIP_HASWELL_CRW_S_GT1    || \
 				 devid == PCI_CHIP_HASWELL_CRW_B_GT1    || \
 				 devid == PCI_CHIP_HASWELL_CRW_E_GT1    || \
-                                 devid == PCI_CHIP_HASWELL_ULT_GT1	|| \
-                                 devid == PCI_CHIP_HASWELL_ULT_M_GT1	|| \
-                                 devid == PCI_CHIP_HASWELL_ULT_S_GT1    || \
+								 devid == PCI_CHIP_HASWELL_ULT_GT1	|| \
+								 devid == PCI_CHIP_HASWELL_ULT_M_GT1	|| \
+								 devid == PCI_CHIP_HASWELL_ULT_S_GT1    || \
 				 devid == PCI_CHIP_HASWELL_ULT_B_GT1    || \
 				 devid == PCI_CHIP_HASWELL_ULT_E_GT1)
 
 
 #define IS_HSW_GT2(devid)   	(devid == PCI_CHIP_HASWELL_GT2||        \
-                                 devid == PCI_CHIP_HASWELL_M_GT2||      \
-                                 devid == PCI_CHIP_HASWELL_S_GT2||      \
+								 devid == PCI_CHIP_HASWELL_M_GT2||      \
+								 devid == PCI_CHIP_HASWELL_S_GT2||      \
 				 devid == PCI_CHIP_HASWELL_B_GT2 || \
 				 devid == PCI_CHIP_HASWELL_E_GT2 || \
-                                 devid == PCI_CHIP_HASWELL_SDV_GT2||    \
-                                 devid == PCI_CHIP_HASWELL_SDV_M_GT2||  \
-                                 devid == PCI_CHIP_HASWELL_SDV_S_GT2||  \
+								 devid == PCI_CHIP_HASWELL_SDV_GT2||    \
+								 devid == PCI_CHIP_HASWELL_SDV_M_GT2||  \
+								 devid == PCI_CHIP_HASWELL_SDV_S_GT2||  \
 				 devid == PCI_CHIP_HASWELL_SDV_B_GT2 || \
 				 devid == PCI_CHIP_HASWELL_SDV_E_GT2 || \
-                                 devid == PCI_CHIP_HASWELL_CRW_GT2||    \
-                                 devid == PCI_CHIP_HASWELL_CRW_M_GT2||  \
-                                 devid == PCI_CHIP_HASWELL_CRW_S_GT2||  \
+								 devid == PCI_CHIP_HASWELL_CRW_GT2||    \
+								 devid == PCI_CHIP_HASWELL_CRW_M_GT2||  \
+								 devid == PCI_CHIP_HASWELL_CRW_S_GT2||  \
 				 devid == PCI_CHIP_HASWELL_CRW_B_GT2|| \
 				 devid == PCI_CHIP_HASWELL_CRW_E_GT2|| \
-                                 devid == PCI_CHIP_HASWELL_ULT_GT2||    \
-                                 devid == PCI_CHIP_HASWELL_ULT_M_GT2||  \
-                                 devid == PCI_CHIP_HASWELL_ULT_S_GT2||  \
+								 devid == PCI_CHIP_HASWELL_ULT_GT2||    \
+								 devid == PCI_CHIP_HASWELL_ULT_M_GT2||  \
+								 devid == PCI_CHIP_HASWELL_ULT_S_GT2||  \
 				 devid == PCI_CHIP_HASWELL_ULT_B_GT2 || \
 				 devid == PCI_CHIP_HASWELL_ULT_E_GT2)
 
@@ -213,52 +213,52 @@
 #define VA_INTEL_HYBRID_POST_DUMP	(1 << 3)
 
 #define IS_HSW_GT3(devid)   	(devid == PCI_CHIP_HASWELL_GT3          || \
-                                 devid == PCI_CHIP_HASWELL_M_GT3        || \
-                                 devid == PCI_CHIP_HASWELL_S_GT3        || \
+								 devid == PCI_CHIP_HASWELL_M_GT3        || \
+								 devid == PCI_CHIP_HASWELL_S_GT3        || \
 				 devid == PCI_CHIP_HASWELL_B_GT3        || \
 				 devid == PCI_CHIP_HASWELL_E_GT3        || \
-                                 devid == PCI_CHIP_HASWELL_SDV_GT3      || \
-                                 devid == PCI_CHIP_HASWELL_SDV_M_GT3    || \
-                                 devid == PCI_CHIP_HASWELL_SDV_S_GT3    || \
+								 devid == PCI_CHIP_HASWELL_SDV_GT3      || \
+								 devid == PCI_CHIP_HASWELL_SDV_M_GT3    || \
+								 devid == PCI_CHIP_HASWELL_SDV_S_GT3    || \
 				 devid == PCI_CHIP_HASWELL_SDV_B_GT3    || \
 				 devid == PCI_CHIP_HASWELL_SDV_E_GT3    || \
-                                 devid == PCI_CHIP_HASWELL_CRW_GT3      || \
-                                 devid == PCI_CHIP_HASWELL_CRW_M_GT3    || \
-                                 devid == PCI_CHIP_HASWELL_CRW_S_GT3    || \
+								 devid == PCI_CHIP_HASWELL_CRW_GT3      || \
+								 devid == PCI_CHIP_HASWELL_CRW_M_GT3    || \
+								 devid == PCI_CHIP_HASWELL_CRW_S_GT3    || \
 				 devid == PCI_CHIP_HASWELL_CRW_B_GT3    || \
 				 devid == PCI_CHIP_HASWELL_CRW_E_GT3    || \
-                                 devid == PCI_CHIP_HASWELL_ULT_GT3      || \
-                                 devid == PCI_CHIP_HASWELL_ULT_M_GT3    || \
-                                 devid == PCI_CHIP_HASWELL_ULT_S_GT3    || \
+								 devid == PCI_CHIP_HASWELL_ULT_GT3      || \
+								 devid == PCI_CHIP_HASWELL_ULT_M_GT3    || \
+								 devid == PCI_CHIP_HASWELL_ULT_S_GT3    || \
 				 devid == PCI_CHIP_HASWELL_ULT_B_GT3    || \
 				 devid == PCI_CHIP_HASWELL_ULT_E_GT3)
 
 #define IS_HASWELL(devid)       (IS_HSW_GT1(devid) || \
-                                 IS_HSW_GT2(devid) || \
-                                 IS_HSW_GT3(devid))
+								 IS_HSW_GT2(devid) || \
+								 IS_HSW_GT3(devid))
 
 #define IS_GEN75(devid)          (IS_HASWELL(devid))
 
 #define IS_GEN7(devid)          (IS_IVYBRIDGE(devid))
 
 #define IS_BROADWELL(devid)             (devid == 0x1602 || \
-	                                 devid == 0x1606 || \
-	                                 devid == 0x160A || \
-	                                 devid == 0x160B || \
-	                                 devid == 0x160D || \
-	                                 devid == 0x160E || \
-	                                 devid == 0x1612 || \
-	                                 devid == 0x1616 || \
-	                                 devid == 0x161A || \
-	                                 devid == 0x161B || \
-	                                 devid == 0x161D || \
-	                                 devid == 0x161E || \
-	                                 devid == 0x1622 || \
-	                                 devid == 0x1626 || \
-	                                 devid == 0x162A || \
-	                                 devid == 0x162B || \
-	                                 devid == 0x162D || \
-	                                 devid == 0x162E )
+									 devid == 0x1606 || \
+									 devid == 0x160A || \
+									 devid == 0x160B || \
+									 devid == 0x160D || \
+									 devid == 0x160E || \
+									 devid == 0x1612 || \
+									 devid == 0x1616 || \
+									 devid == 0x161A || \
+									 devid == 0x161B || \
+									 devid == 0x161D || \
+									 devid == 0x161E || \
+									 devid == 0x1622 || \
+									 devid == 0x1626 || \
+									 devid == 0x162A || \
+									 devid == 0x162B || \
+									 devid == 0x162D || \
+									 devid == 0x162E )
 
 #define IS_GEN8(devid)  (IS_BROADWELL(devid))
 
@@ -274,42 +274,42 @@
 				devid == PCI_CHIP_CHV_3)
 
 #define IS_SKL_GT1(devid)       (devid == PCI_CHIP_SKYLAKE_GT1_DESK       || \
-                                 devid == PCI_CHIP_SKYLAKE_GT1_DT         || \
-                                 devid == PCI_CHIP_SKYLAKE_GT1_ULT        || \
-                                 devid == PCI_CHIP_SKYLAKE_GT1_ULX        || \
-                                 devid == PCI_CHIP_SKYLAKE_GT1_HALO_MOBL  || \
-                                 devid == PCI_CHIP_SKYLAKE_GT1_SERV)
+								 devid == PCI_CHIP_SKYLAKE_GT1_DT         || \
+								 devid == PCI_CHIP_SKYLAKE_GT1_ULT        || \
+								 devid == PCI_CHIP_SKYLAKE_GT1_ULX        || \
+								 devid == PCI_CHIP_SKYLAKE_GT1_HALO_MOBL  || \
+								 devid == PCI_CHIP_SKYLAKE_GT1_SERV)
 
 #define IS_SKL_GT1_5(devid)     (devid == PCI_CHIP_SKYLAKE_GT1_5_DT       || \
-                                 devid == PCI_CHIP_SKYLAKE_GT1_5_ULT      || \
-                                 devid == PCI_CHIP_SKYLAKE_GT1_5_ULX)
+								 devid == PCI_CHIP_SKYLAKE_GT1_5_ULT      || \
+								 devid == PCI_CHIP_SKYLAKE_GT1_5_ULX)
 
 #define IS_SKL_GT2(devid)       (devid == PCI_CHIP_SKYLAKE_GT2_DESK       || \
-                                 devid == PCI_CHIP_SKYLAKE_GT2_DT         || \
-                                 devid == PCI_CHIP_SKYLAKE_GT2_ULT        || \
-                                 devid == PCI_CHIP_SKYLAKE_GT2F_ULT       || \
-                                 devid == PCI_CHIP_SKYLAKE_GT2_ULX        || \
-                                 devid == PCI_CHIP_SKYLAKE_GT2_HALO_MOBL  || \
-                                 devid == PCI_CHIP_SKYLAKE_GT2_SERV       || \
-                                 devid == PCI_CHIP_SKYLAKE_GT2_WRK)
+								 devid == PCI_CHIP_SKYLAKE_GT2_DT         || \
+								 devid == PCI_CHIP_SKYLAKE_GT2_ULT        || \
+								 devid == PCI_CHIP_SKYLAKE_GT2F_ULT       || \
+								 devid == PCI_CHIP_SKYLAKE_GT2_ULX        || \
+								 devid == PCI_CHIP_SKYLAKE_GT2_HALO_MOBL  || \
+								 devid == PCI_CHIP_SKYLAKE_GT2_SERV       || \
+								 devid == PCI_CHIP_SKYLAKE_GT2_WRK)
 
 #define IS_SKL_GT3(devid)       (devid == PCI_CHIP_SKYLAKE_GT3_DESK       || \
-                                 devid == PCI_CHIP_SKYLAKE_GT3_ULT        || \
-                                 devid == PCI_CHIP_SKYLAKE_GT3_HALO_MOBL  || \
-                                 devid == PCI_CHIP_SKYLAKE_GT3_SERV)
+								 devid == PCI_CHIP_SKYLAKE_GT3_ULT        || \
+								 devid == PCI_CHIP_SKYLAKE_GT3_HALO_MOBL  || \
+								 devid == PCI_CHIP_SKYLAKE_GT3_SERV)
 
 #define IS_SKL_GT4(devid)       (devid == PCI_CHIP_SKYLAKE_GT4_DT         || \
-                                 devid == PCI_CHIP_SKYLAKE_GT4_DESK       || \
-                                 devid == PCI_CHIP_SKYLAKE_GT4_HALO_MOBL  || \
-                                 devid == PCI_CHIP_SKYLAKE_GT4_SERV       || \
-                                 devid == PCI_CHIP_SKYLAKE_GT4_WRK)
+								 devid == PCI_CHIP_SKYLAKE_GT4_DESK       || \
+								 devid == PCI_CHIP_SKYLAKE_GT4_HALO_MOBL  || \
+								 devid == PCI_CHIP_SKYLAKE_GT4_SERV       || \
+								 devid == PCI_CHIP_SKYLAKE_GT4_WRK)
 
 
 #define IS_SKYLAKE(devid)       (IS_SKL_GT1(devid)   || \
-                                 IS_SKL_GT1_5(devid) || \
-                                 IS_SKL_GT2(devid)   || \
-                                 IS_SKL_GT3(devid)   || \
-                                 IS_SKL_GT4(devid))
+								 IS_SKL_GT1_5(devid) || \
+								 IS_SKL_GT2(devid)   || \
+								 IS_SKL_GT3(devid)   || \
+								 IS_SKL_GT4(devid))
 
 #define IS_GEN9(devid)  (IS_SKYLAKE(devid))
 

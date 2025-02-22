@@ -1,5 +1,5 @@
 /* 
-* Copyright (c) 2014, Intel Corporation
+* Copyright (C) 2014, Intel Corporation
 *
 * All rights reserved.
 * Redistribution.  Redistribution and use in binary form, without modification, are 

@@ -1,5 +1,5 @@
 /*
- * Copyright ©  2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -33,8 +33,8 @@
 #include "media_drv_data.h"
 #include "media_drv_gpe_utils.h"
 #define __ADVANCE_BATCH(batch) do {             \
-        media_batchbuffer_advance(batch); \
-    } while (0)
+		media_batchbuffer_advance(batch); \
+	} while (0)
 
 #define ADVANCE_BATCH(batch)            __ADVANCE_BATCH(batch)
 typedef struct _media_command_buffer
@@ -65,33 +65,33 @@ VOID media_batchbuffer_begin (MEDIA_BATCH_BUFFER * batch, INT total);
 VOID media_batchbuffer_require_space (MEDIA_BATCH_BUFFER * batch, UINT size);
 VOID
 media_batchbuffer_emit_reloc (MEDIA_BATCH_BUFFER * batch, dri_bo * bo,
-			      UINT read_domains, UINT write_domains,
-			      UINT delta);
+				  UINT read_domains, UINT write_domains,
+				  UINT delta);
 
 VOID media_batchbuffer_check_flag (MEDIA_BATCH_BUFFER * batch, INT flag);
 #define __OUT_BATCH(batch, d) do {              \
-       media_batchbuffer_emit_dword(batch, d); \
-    } while (0)
+	   media_batchbuffer_emit_dword(batch, d); \
+	} while (0)
 
 #define OUT_BATCH(batch, d)             __OUT_BATCH(batch, d)
 
 #define __BEGIN_BATCH(batch, n, f) do {                         \
-        assert(f == batch->flag);                               \
-        media_batchbuffer_check_flag(batch, f);     \
-        media_batchbuffer_require_space(batch, (n) * 4);        \
-        media_batchbuffer_begin(batch, (n));              \
-    } while (0)
+		assert(f == batch->flag);                               \
+		media_batchbuffer_check_flag(batch, f);     \
+		media_batchbuffer_require_space(batch, (n) * 4);        \
+		media_batchbuffer_begin(batch, (n));              \
+	} while (0)
 
 #define BEGIN_BATCH(batch, n)           __BEGIN_BATCH(batch, n, I915_EXEC_RENDER)
 
 #define __OUT_RELOC(batch, bo, read_domains, write_domain, delta) do {  \
-        assert((delta) >= 0);                                           \
-        media_batchbuffer_emit_reloc(batch, bo,                         \
-                                     read_domains, write_domain,        \
-                                     delta);                            \
-    } while (0)
+		assert((delta) >= 0);                                           \
+		media_batchbuffer_emit_reloc(batch, bo,                         \
+									 read_domains, write_domain,        \
+									 delta);                            \
+	} while (0)
 #define OUT_RELOC(batch, bo, read_domains, write_domain, delta) \
-    __OUT_RELOC(batch, bo, read_domains, write_domain, delta)
+	__OUT_RELOC(batch, bo, read_domains, write_domain, delta)
 
 MEDIA_BATCH_BUFFER *media_batchbuffer_new (struct media_driver_data *drv_data,
 					   INT flag, INT buffer_size);

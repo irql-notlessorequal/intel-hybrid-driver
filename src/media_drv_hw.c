@@ -1,5 +1,5 @@
 /*
- * Copyright © 2009 Intel Corporation
+ * Copyright (C) 2009 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -33,22 +33,30 @@
 #include "media_drv_hw_g8.h"
 #include "media_drv_hw_g9.h"
 
-VOID
-media_hw_context_init(VADriverContextP ctx)
+VOID media_hw_context_init(VADriverContextP ctx)
 {
-  MEDIA_DRV_CONTEXT *drv_ctx = (MEDIA_DRV_CONTEXT *) (ctx->pDriverData);
-  MEDIA_HW_CONTEXT *hw_ctx = &drv_ctx->hw_context;
+	MEDIA_DRV_CONTEXT *drv_ctx = (MEDIA_DRV_CONTEXT *)(ctx->pDriverData);
+	MEDIA_HW_CONTEXT *hw_ctx = &drv_ctx->hw_context;
 
-  if (IS_HASWELL (drv_ctx->drv_data.device_id)) {
-    media_hw_context_init_g75(ctx, hw_ctx);
-  } else if (IS_GEN7 (drv_ctx->drv_data.device_id)) {
-    media_hw_context_init_g7(ctx, hw_ctx);
-  } else if (IS_GEN8 (drv_ctx->drv_data.device_id)) {
-    media_hw_context_init_g8(ctx, hw_ctx);
-  } else if (IS_GEN9 (drv_ctx->drv_data.device_id)) {
-    media_hw_context_init_g9(ctx, hw_ctx);
-  } else {
-    printf ("Platform not supported");
-    MEDIA_DRV_ASSERT (0);
-  }
+	if (IS_HASWELL(drv_ctx->drv_data.device_id))
+	{
+		media_hw_context_init_g75(ctx, hw_ctx);
+	}
+	else if (IS_GEN7(drv_ctx->drv_data.device_id))
+	{
+		media_hw_context_init_g7(ctx, hw_ctx);
+	}
+	else if (IS_GEN8(drv_ctx->drv_data.device_id))
+	{
+		media_hw_context_init_g8(ctx, hw_ctx);
+	}
+	else if (IS_GEN9(drv_ctx->drv_data.device_id))
+	{
+		media_hw_context_init_g9(ctx, hw_ctx);
+	}
+	else
+	{
+		printf("Platform not supported");
+		MEDIA_DRV_ASSERT(0);
+	}
 }

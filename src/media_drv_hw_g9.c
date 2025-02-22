@@ -1,5 +1,5 @@
 /*
- * Copyright ©  2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -31,14 +31,13 @@
 #include "media_drv_surface.h"
 
 struct hw_codec_info gen9_hw_codec_info = {
-  .max_width = 4096,
-  .max_height = 4096,
-  .tiled_surface = 1,
-  .vp9_dec_hybrid_support = 1,
-  .render_init = media_drv_gen9_render_init,
- };
+	.max_width = 4096,
+	.max_height = 4096,
+	.tiled_surface = 1,
+	.vp9_dec_hybrid_support = 1,
+	.render_init = media_drv_gen9_render_init,
+};
 
-VOID
-media_hw_context_init_g9(VADriverContextP ctx, MEDIA_HW_CONTEXT *hw_ctx)
+VOID media_hw_context_init_g9(VADriverContextP ctx, MEDIA_HW_CONTEXT *hw_ctx)
 {
 }

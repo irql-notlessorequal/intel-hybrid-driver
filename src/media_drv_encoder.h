@@ -1,5 +1,5 @@
 /*
- * Copyright ©  2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -204,12 +204,12 @@ typedef struct media_encoder_ctx
 				   MBPAK_SURFACE_PARAMS_VP8 *
 				   mbpak_sutface_params);
   void (*set_curbe_vp8_mbpak) (struct encode_state * encode_state,
-			       MEDIA_MBPAK_CURBE_PARAMS_VP8 * params);
+				   MEDIA_MBPAK_CURBE_PARAMS_VP8 * params);
   void (*set_curbe_vp8_brc_init_reset) (struct encode_state *encode_state,
 					MEDIA_BRC_INIT_RESET_PARAMS_VP8 * params);
   void (*surface_state_vp8_brc_init_reset) (struct media_encoder_ctx * encoder_context,
-					    struct encode_state *encode_state,
-					    BRC_INIT_RESET_SURFACE_PARAMS_VP8 *surface_params);
+						struct encode_state *encode_state,
+						BRC_INIT_RESET_SURFACE_PARAMS_VP8 *surface_params);
   void (*set_curbe_vp8_brc_update) (struct encode_state *encode_state,
 					  MEDIA_BRC_UPDATE_PARAMS_VP8 * params);
   void (*surface_state_vp8_brc_update) (struct media_encoder_ctx * encoder_context,
@@ -247,23 +247,23 @@ typedef struct media_encoder_vp8_surface
 
 void
 media_alloc_resource_scaling (VADriverContextP ctx,
-			      MEDIA_ENCODER_CTX * encoder_context);
+				  MEDIA_ENCODER_CTX * encoder_context);
 VOID
 media_alloc_resource_me (VADriverContextP ctx,
 			 MEDIA_ENCODER_CTX * encoder_context);
 
 void
 media_encode_mb_layout_vp8 (MEDIA_ENCODER_CTX * encoder_context, void *data,
-			    UINT * data_size);
+				UINT * data_size);
 struct hw_context *media_enc_context_init (VADriverContextP ctx,
 					   struct object_config *obj_config,
 					   int picture_width,
 					   int picture_height);
 VAStatus
 media_encoder_picture (VADriverContextP ctx,
-		       VAProfile profile,
-		       union codec_state *codec_state,
-		       struct hw_context *hw_context);
+			   VAProfile profile,
+			   union codec_state *codec_state,
+			   struct hw_context *hw_context);
 void
 gpe_context_vfe_scoreboardinit_pak_p1 (MEDIA_ENCODER_CTX * encoder_context,MEDIA_GPE_CTX * gpe_context);
 void

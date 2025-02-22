@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -51,9 +51,9 @@
 
 static VAStatus
 intel_media_decode_picture(VADriverContextP ctx,
-                           VAProfile profile,
-                           union codec_state *codec_state,
-                           struct hw_context *hw_context)
+						   VAProfile profile,
+						   union codec_state *codec_state,
+						   struct hw_context *hw_context)
 {
   return VA_STATUS_ERROR_UNIMPLEMENTED;
 }
@@ -64,20 +64,20 @@ intel_media_context_destroy(void *hw_context)
   struct hw_context *decoder_context = hw_context;
 
   if (decoder_context)
-    free(decoder_context);
+	free(decoder_context);
   return;
 }
 
 struct hw_context *
 media_dec_hw_context_init (VADriverContextP ctx,
-                           struct object_config *obj_config)
+						   struct object_config *obj_config)
 {
   MEDIA_DRV_CONTEXT *drv_ctx = (MEDIA_DRV_CONTEXT *) (ctx->pDriverData);
   struct hw_context *decoder_context = NULL;
 
   if (drv_ctx->codec_info->vp9_dec_hybrid_support &&
-      (obj_config->profile == VAProfileVP9Profile0)) {
-    return media_hybrid_dec_hw_context_init(ctx, obj_config);
+	  (obj_config->profile == VAProfileVP9Profile0)) {
+	return media_hybrid_dec_hw_context_init(ctx, obj_config);
   }
 
   decoder_context = (struct hw_context *) media_drv_alloc_memory (sizeof(struct hw_context));

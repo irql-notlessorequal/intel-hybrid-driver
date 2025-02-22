@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -27,7 +27,7 @@
  */
 
 /*
- * Copyright (c) 2010, The WebM Project authors. All rights reserved.
+ * Copyright (C) 2010, The WebM Project authors. All rights reserved.
  *
  * An additional intellectual property rights grant can be found
  * in the file LIBVPX_PATENTS.  All contributing project authors may
@@ -65,113 +65,113 @@
 
 const UCHAR g_Vp9NormTable[BAC_ENG_MAX_RANGE+1] =
 {
-    0, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4,
-    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	0, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 INT Intel_HostvldVp9_BacEngineInit(
-    PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
-    PUCHAR                           pBuf,
-    DWORD                            dwBufSize)
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
+	PUCHAR                           pBuf,
+	DWORD                            dwBufSize)
 {
-    register UINT32 ui32RegOp = *((PUINT32)pBuf);
-    INTEL_HOSTVLD_VP9_BAC_VALUE BacValue = 0;
-    INT iCount  = 0;
+	register UINT32 ui32RegOp = *((PUINT32)pBuf);
+	INTEL_HOSTVLD_VP9_BAC_VALUE BacValue = 0;
+	INT iCount  = 0;
 
-    pBacEngine->pBuf     = pBuf;
-    pBacEngine->pBufEnd  = pBuf + dwBufSize;
-    pBacEngine->uiRange  = BAC_ENG_MAX_RANGE;
+	pBacEngine->pBuf     = pBuf;
+	pBacEngine->pBufEnd  = pBuf + dwBufSize;
+	pBacEngine->uiRange  = BAC_ENG_MAX_RANGE;
 
-    if (dwBufSize >= 4) {
+	if (dwBufSize >= 4) {
 	pBacEngine->BacValue =
 		(ui32RegOp << (BYTE_BITS * 3)) | ((ui32RegOp & 0xFF00) << BYTE_BITS) |
 		((ui32RegOp & 0xFF0000) >> BYTE_BITS) | (ui32RegOp >> (BYTE_BITS * 3));
 	pBacEngine->pBuf += 4;
 	pBacEngine->iCount = (BYTE_BITS << 2);
-    } else {
+	} else {
 	// 16-bit fill or 8-bit fill for the last even byte to avoid segfault
 	INTEL_HOSTVLD_VP9_BACENGINE_FILL();
 
 	pBacEngine->iCount = iCount;
 	pBacEngine->BacValue = BacValue;
-    }
-    return Intel_HostvldVp9_BacEngineReadSingleBit(pBacEngine);
+	}
+	return Intel_HostvldVp9_BacEngineReadSingleBit(pBacEngine);
 }
 
 INT Intel_HostvldVp9_BacEngineReadBit(
-    PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
-    INT                              iProb)
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
+	INT                              iProb)
 {
-    INTEL_HOSTVLD_VP9_BAC_VALUE BacValue = pBacEngine->BacValue;
-    INT  iCount  = pBacEngine->iCount;
-    UINT uiRange = pBacEngine->uiRange;
-    UINT uiShift = g_Vp9NormTable[uiRange];
-    UINT uiSplit;
-    INT  iBit;
-    INTEL_HOSTVLD_VP9_BAC_VALUE BacSplitValue;
+	INTEL_HOSTVLD_VP9_BAC_VALUE BacValue = pBacEngine->BacValue;
+	INT  iCount  = pBacEngine->iCount;
+	UINT uiRange = pBacEngine->uiRange;
+	UINT uiShift = g_Vp9NormTable[uiRange];
+	UINT uiSplit;
+	INT  iBit;
+	INTEL_HOSTVLD_VP9_BAC_VALUE BacSplitValue;
 
-    uiRange  <<= uiShift;
-    BacValue <<= uiShift;
-    iCount    -= uiShift;
+	uiRange  <<= uiShift;
+	BacValue <<= uiShift;
+	iCount    -= uiShift;
 
-    uiSplit       = ((uiRange * iProb) + (BAC_ENG_PROB_RANGE - iProb)) >> BAC_ENG_PROB_BITS;
-    BacSplitValue = (INTEL_HOSTVLD_VP9_BAC_VALUE)uiSplit << (BAC_ENG_VALUE_BITS - BAC_ENG_PROB_BITS);
+	uiSplit       = ((uiRange * iProb) + (BAC_ENG_PROB_RANGE - iProb)) >> BAC_ENG_PROB_BITS;
+	BacSplitValue = (INTEL_HOSTVLD_VP9_BAC_VALUE)uiSplit << (BAC_ENG_VALUE_BITS - BAC_ENG_PROB_BITS);
 
-    INTEL_HOSTVLD_VP9_BACENGINE_FILL();
+	INTEL_HOSTVLD_VP9_BACENGINE_FILL();
 
-    iBit = (BacValue >= BacSplitValue);
-    pBacEngine->uiRange  = iBit ? (uiRange - uiSplit) : uiSplit;
-    pBacEngine->BacValue = iBit ? (BacValue - BacSplitValue) : BacValue;
-    pBacEngine->iCount   = iCount;
+	iBit = (BacValue >= BacSplitValue);
+	pBacEngine->uiRange  = iBit ? (uiRange - uiSplit) : uiSplit;
+	pBacEngine->BacValue = iBit ? (BacValue - BacSplitValue) : BacValue;
+	pBacEngine->iCount   = iCount;
 
-    return iBit;
+	return iBit;
 }
 
 INT Intel_HostvldVp9_BacEngineReadSingleBit(
-    PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine)
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine)
 {
-    return Intel_HostvldVp9_BacEngineReadBit(pBacEngine, BAC_ENG_PROB_HALF);
+	return Intel_HostvldVp9_BacEngineReadBit(pBacEngine, BAC_ENG_PROB_HALF);
 }
 
 INT Intel_HostvldVp9_BacEngineReadMultiBits(
-    PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
-    register INT                    iNumBits)
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
+	register INT                    iNumBits)
 {
-    register INT iBits = 0;
+	register INT iBits = 0;
 
-    while((iNumBits--) > 0)
-    {
-        iBits ^= (Intel_HostvldVp9_BacEngineReadSingleBit(pBacEngine) << iNumBits);
-    }
+	while((iNumBits--) > 0)
+	{
+		iBits ^= (Intel_HostvldVp9_BacEngineReadSingleBit(pBacEngine) << iNumBits);
+	}
 
-    return iBits;
+	return iBits;
 }
 
 INT Intel_HostvldVp9_BacEngineReadTree(
-    PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
-    INTEL_HOSTVLD_VP9_TKN_TREE    TknTree)
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
+	INTEL_HOSTVLD_VP9_TKN_TREE    TknTree)
 {
-    register PINTEL_HOSTVLD_VP9_TKN_TREE_NODE pNode = TknTree;
-    register INT8 i8Offset = pNode->i8Offset;
+	register PINTEL_HOSTVLD_VP9_TKN_TREE_NODE pNode = TknTree;
+	register INT8 i8Offset = pNode->i8Offset;
 
-    do
-    {
-        pNode += Intel_HostvldVp9_BacEngineReadBit(pBacEngine, pNode->ui8Prob) - i8Offset;
-    } while((i8Offset = pNode->i8Offset) < 0);
+	do
+	{
+		pNode += Intel_HostvldVp9_BacEngineReadBit(pBacEngine, pNode->ui8Prob) - i8Offset;
+	} while((i8Offset = pNode->i8Offset) < 0);
 
-    return pNode->i8Token;
+	return pNode->i8Token;
 }

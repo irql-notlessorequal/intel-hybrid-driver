@@ -1,5 +1,5 @@
 /*
- * Copyright ©  2014  Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -30,20 +30,26 @@
 #define _MEDIA__DRIVER_OUT_DRI_H
 #include <stdbool.h>
 #include "media_drv_defines.h"
+
+#if VA_CHECK_VERSION(1, 0, 0)
 #define LIBVA_X11_NAME "libva-x11.so.2"
+#else
+#define LIBVA_X11_NAME "libva-x11.so.1"
+#endif
+
 VOID media_output_dri_terminate (VADriverContextP ctx);
 BOOL media_output_dri_init (VADriverContextP ctx);
 
 VAStatus
 media_put_surface_dri(
-    VADriverContextP    ctx,
-    VASurfaceID         surface,
-    void               *draw,
-    const VARectangle  *src_rect,
-    const VARectangle  *dst_rect,
-    const VARectangle  *cliprects,
-    unsigned int        num_cliprects,
-    unsigned int        flags
+	VADriverContextP    ctx,
+	VASurfaceID         surface,
+	void               *draw,
+	const VARectangle  *src_rect,
+	const VARectangle  *dst_rect,
+	const VARectangle  *cliprects,
+	unsigned int        num_cliprects,
+	unsigned int        flags
 );
 
 #endif

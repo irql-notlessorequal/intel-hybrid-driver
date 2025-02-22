@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -37,14 +37,14 @@ extern "C" {
 #endif
 
 extern int intel_hybrid_writefilefromptr(
-    const char             *pFilename,
-    void                   *lpBuffer,
-    uint32_t                  writeSize);
+	const char             *pFilename,
+	void                   *lpBuffer,
+	uint32_t                  writeSize);
 
 extern int intel_hybrid_appendfilefromptr(
-    const char              *pFilename,
-    void                    *pData,
-    uint32_t                    dwSize);
+	const char              *pFilename,
+	void                    *pData,
+	uint32_t                    dwSize);
 
 
 extern char *intel_alloc_zero_aligned_memory(uint32_t size, uint32_t alignment);

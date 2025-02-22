@@ -1,5 +1,5 @@
 /*
- * Copyright ©  2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -39,9 +39,9 @@ VOID media_object_walker_mbenc_init(BOOL mbenc_i_frame_dist_in_use,BOOL mbenc_ph
 VOID media_encoder_init_vp8 (VADriverContextP ctx,MEDIA_ENCODER_CTX * encoder_context);
 VOID
 media_alloc_resource_brc_init_reset (VADriverContextP ctx,
-                                     MEDIA_ENCODER_CTX * encoder_context);
+									 MEDIA_ENCODER_CTX * encoder_context);
 VOID
 media_alloc_resource_brc_update (VADriverContextP ctx,
-                                 MEDIA_ENCODER_CTX * encoder_context);
+								 MEDIA_ENCODER_CTX * encoder_context);
 
 #endif

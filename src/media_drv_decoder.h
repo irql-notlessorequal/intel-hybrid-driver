@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -33,5 +33,5 @@
 #include "media_drv_util.h"
 
 extern struct hw_context *media_dec_hw_context_init (VADriverContextP ctx,
-                                                     struct object_config *obj_config);
+													 struct object_config *obj_config);
 #endif

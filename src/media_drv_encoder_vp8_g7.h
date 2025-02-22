@@ -1,5 +1,5 @@
 /*
- * Copyright ©  2014 Intel Corporation
+ * Copyright (C) 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
@@ -30,19 +30,19 @@
 #define _MEDIA__DRIVER_ENCODER_VP8_G7_H
 VOID
 media_mbenc_context_init_g7 (VADriverContextP ctx,
-			     MEDIA_ENCODER_CTX * encoder_context);
+				 MEDIA_ENCODER_CTX * encoder_context);
 VOID
 media_mbpak_context_init_vp8_g7 (VADriverContextP ctx,
 				 MEDIA_ENCODER_CTX * encoder_context);
 VOID
 media_brc_init_reset_context_init_g7(VADriverContextP ctx,
-				     MEDIA_ENCODER_CTX * encoder_context);
+					 MEDIA_ENCODER_CTX * encoder_context);
 VOID
 media_brc_update_context_init_g7(VADriverContextP ctx,
 				 MEDIA_ENCODER_CTX * encoder_context);
 VOID
 media_scaling_context_init_g7 (VADriverContextP ctx,
-			       MEDIA_ENCODER_CTX * encoder_context);
+				   MEDIA_ENCODER_CTX * encoder_context);
 
 VOID
 media_me_context_init_g7 (VADriverContextP ctx,
