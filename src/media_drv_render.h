@@ -93,11 +93,9 @@ struct media_render_state
 	UINT16 inited;
 	struct region *draw_region;
 
-	INT pp_flag; /* 0: disable, 1: enable */
-
 	struct media_render_kernel render_kernels[3];
 
-	INT max_wm_threads;
+	UINT max_wm_threads;
 
 	struct
 	{

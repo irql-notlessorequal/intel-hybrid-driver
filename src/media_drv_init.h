@@ -238,11 +238,11 @@ typedef struct _media_drv_context
 	MEDIA_BATCH_BUFFER *render_batch;
 	MEDIA_DRV_MUTEX render_mutex;
 	MEDIA_DRV_MUTEX pp_mutex;
+	UINT cpu_flags;
 	CHAR va_vendor[256];
 	// display attributes
 	VADisplayAttribute *display_attributes;
 	UINT num_display_attributes;
-	UINT cpu_flags;
 	VADisplayAttribute *rotation_attrib;
 	VADisplayAttribute *brightness_attrib;
 	VADisplayAttribute *contrast_attrib;

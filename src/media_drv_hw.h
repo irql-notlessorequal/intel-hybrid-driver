@@ -83,9 +83,9 @@ typedef struct _media_mbenc_curbe_params_vp8
 	UINT kernel_mode;
 	UINT mb_enc_iframe_dist_in_use;
 	UINT updated;
-	UINT hme_enabled;
+	BOOL hme_enabled;
 	UINT ref_frame_ctrl;
-	UINT brc_enabled;
+	BOOL brc_enabled;
 	MEDIA_FRAME_UPDATE *frame_update;
 	VOID *curbe_cmd_buff;
 } MEDIA_MBENC_CURBE_PARAMS_VP8;
@@ -118,7 +118,7 @@ typedef struct _media_brc_distortion_params_vp8
 	UINT frame_height_in_mbs;
 	UINT avbr_accuracy;
 	UINT avbr_convergence;
-	UINT hme_enabled;
+	BOOL hme_enabled;
 	UINT brc_initted;
 	UINT kernel_mode;
 	UINT pic_coding_type;
@@ -210,8 +210,8 @@ typedef struct brc_distortion_surface_set_params_vp8
 
 struct hw_codec_info
 {
-	INT max_width;
-	INT max_height;
+	UINT max_width;
+	UINT max_height;
 	UINT tiled_surface : 1;
 	UINT vp8_enc_hybrid_support : 1;
 	UINT vp9_dec_hybrid_support : 1;
@@ -255,7 +255,8 @@ enum MI_SET_PREDICATE_ENABLE
 };
 typedef struct mi_set_predicate_params
 {
-	UINT predicate_en;
+	/* We only need two bits for this. */
+	UINT predicate_en : 2;
 } MI_SET_PREDICATE_PARAMS;
 
 typedef struct media_idt_params
@@ -278,7 +279,7 @@ typedef struct media_vfe_state_params
 	UINT num_urb_entries;
 	UINT urb_entry_size;
 	UINT curbe_allocation_size;
-	UINT scoreboard_enable;
+	UINT scoreboard_enable : 1;
 	UINT scoreboard_type;
 	UINT scoreboard_mask;
 	UINT scoreboardDW5;
@@ -319,7 +320,8 @@ typedef struct _vp8_me_curbe_params
 	UINT kernel_mode;
 	UINT frame_width;
 	UINT frame_field_height;
-	UINT me_16x_enabled;
+	/* 0-3 */
+	UINT me_16x_enabled : 2;
 	UINT me_16x;
 	UINT picture_coding_type;
 	VOID *curbe_cmd_buff;
