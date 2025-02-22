@@ -25,7 +25,7 @@ SUBDIRS = vp9hdec
 
 AM_CPPFLAGS = \
 	-DPTHREADS		\
-        -DVA_DRIVERS_PATH="\"$(LIBVA_DRIVERS_PATH)\"" \
+		-DVA_DRIVERS_PATH="\"$(LIBVA_DRIVERS_PATH)\"" \
 	$(DRM_CFLAGS)		\
 	$(DRM_INTEL_CFLAGS)	\
 	$(CMRT_CFLAGS)		\
@@ -54,73 +54,76 @@ driver_libs = \
 	$(NULL)
 
 driver_files = \
-        dso_utils.c            \
-	object_heap.c		\
-	media_drv_util.c   \
-        media_drv_gpe_utils.c   \
-        media_drv_batchbuffer.c \
-        media_drv_common.c \
-        media_drv_driver.c  \
-        media_drv_encoder.c \
-        media_drv_encoder_vp8.c \
-        media_drv_encoder_vp8_g7.c \
-        media_drv_hw.c	\
-        media_drv_hwcmds.c  \
-        media_drv_hwcmds_g8.c \
-        media_drv_hw_g9.c  \
-        media_drv_hw_g8.c  \
-        media_drv_hw_g75.c  \
-        media_drv_hw_g7.c  \
-        media_drv_init.c   \
-        media_drv_kernels.c  \
-        media_drv_kernels_g7.c  \
-        media_drv_render.c   \
-        media_drv_surface.c  \
-        media_drv_decoder.c  \
-        media_drv_gen75_render.c   \
-        media_drv_gen8_render.c   \
-        media_drv_gen9_render.c   \
-        media_drv_hybrid_vp9_common.cpp   \
-        $(NULL)
+		dso_utils.c \
+		object_heap.c \
+		media_drv_cpu.c \
+		media_drv_util.c \
+		media_drv_gpe_utils.c   \
+		media_drv_batchbuffer.c \
+		media_drv_common.c \
+		media_drv_driver.c  \
+		media_drv_encoder.c \
+		media_drv_encoder_vp8.c \
+		media_drv_encoder_vp8_g7.c \
+		media_drv_hw.c	\
+		media_drv_hwcmds.c  \
+		media_drv_hwcmds_g8.c \
+		media_drv_hw_g9.c  \
+		media_drv_hw_g8.c  \
+		media_drv_hw_g75.c  \
+		media_drv_hw_g7.c  \
+		media_drv_init.c   \
+		media_drv_kernels.c  \
+		media_drv_kernels_g7.c  \
+		media_drv_render.c   \
+		media_drv_surface.c  \
+		media_drv_decoder.c  \
+		media_drv_gen75_render.c   \
+		media_drv_gen8_render.c   \
+		media_drv_gen9_render.c   \
+		media_drv_hybrid_vp9_common.cpp   \
+		$(NULL)
 
 if USE_X11
 driver_files	+=media_drv_output_dri.c
 endif
 
 driver_headers = \
-        dso_utils.h             \
-	i965_mutext.h		\
-	intel_compiler.h	\
-	object_heap.h           \
-	sysdeps.h		\
-	va_backend_compat.h	\
-        media_drv_defines.h  \
-        media_drv_util.h  \
-        media_drv_gpe_utils.h  \
-        media_drv_batchbuffer.h  \
-        media_drv_common.h  \
-        media_drv_data.h  \
-        media_drv_driver.h  \
-        media_drv_encoder.h  \
-        media_drv_encoder_vp8.h  \
-        media_drv_encoder_vp8_g7.h \
-        media_drv_hwcmds.h  \
-        media_drv_hwcmds_g8.h \
-        media_drv_hw_g9.h  \
-        media_drv_hw_g8.h  \
-        media_drv_hw_g75.h  \
-        media_drv_hw_g7.h  \
-        media_drv_hw.h     \
-        media_drv_init.h   \
-        media_drv_kernels.h \
-        media_drv_kernels_g7.h \
-        media_drv_output_dri.h  \
-        media_drv_render.h  \
-        media_drv_surface.h   \
-        media_drv_decoder.h   \
-        media_render_common.h  \
-        media_drv_hybrid_vp9_common.h   \
-       $(NULL)
+		dso_utils.h \
+		i965_mutext.h \
+		intel_compiler.h \
+		object_heap.h \
+		sysdeps.h \
+		va_backend_compat.h	\
+		media_drv_cpuid.h \
+		media_drv_cpu.h \
+		media_drv_defines.h  \
+		media_drv_util.h  \
+		media_drv_gpe_utils.h  \
+		media_drv_batchbuffer.h  \
+		media_drv_common.h  \
+		media_drv_data.h  \
+		media_drv_driver.h  \
+		media_drv_encoder.h  \
+		media_drv_encoder_vp8.h  \
+		media_drv_encoder_vp8_g7.h \
+		media_drv_hwcmds.h  \
+		media_drv_hwcmds_g8.h \
+		media_drv_hw_g9.h  \
+		media_drv_hw_g8.h  \
+		media_drv_hw_g75.h  \
+		media_drv_hw_g7.h  \
+		media_drv_hw.h     \
+		media_drv_init.h   \
+		media_drv_kernels.h \
+		media_drv_kernels_g7.h \
+		media_drv_output_dri.h  \
+		media_drv_render.h  \
+		media_drv_surface.h   \
+		media_drv_decoder.h   \
+		media_render_common.h  \
+		media_drv_hybrid_vp9_common.h   \
+	   $(NULL)
 
 if USE_X11
 driver_headers	+=media_drv_output_dri.h

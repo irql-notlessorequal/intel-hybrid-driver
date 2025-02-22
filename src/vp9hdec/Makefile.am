@@ -39,6 +39,7 @@ driver_cflags = \
 	-Wall			\
 	-Wno-unused-variable      \
 	-fvisibility=hidden	\
+	-msse3 -mssse3 -msse4 -msse4.1 -msse4.2 \
 	$(NULL)
 
 

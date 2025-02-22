@@ -243,6 +243,7 @@ typedef struct _media_drv_context
 	// display attributes
 	VADisplayAttribute *display_attributes;
 	UINT num_display_attributes;
+	UINT cpu_flags;
 	VADisplayAttribute *rotation_attrib;
 	VADisplayAttribute *brightness_attrib;
 	VADisplayAttribute *contrast_attrib;

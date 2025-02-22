@@ -39,6 +39,8 @@
 #include "media_drv_hw_g7.h"
 #include "object_heap.h"
 
+#include "media_drv_cpu.c"
+
 uint32_t g_intel_debug_option_flags = 0;
 
 BOOL media_drv_intel_bufmgr_init(MEDIA_DRV_CONTEXT *drv_ctx)
@@ -129,9 +131,17 @@ BOOL media_driver_init(VADriverContextP ctx)
 	drv_ctx->drv_data.fd = drm_state->fd;
 	drv_ctx->drv_data.dri2_enabled =
 		(VA_CHECK_DRM_AUTH_TYPE(ctx, VA_DRM_AUTH_DRI2) || VA_CHECK_DRM_AUTH_TYPE(ctx, VA_DRM_AUTH_CUSTOM));
+	drv_ctx->cpu_flags = media_drv_cpu_detect();
 
 	if (!drv_ctx->drv_data.dri2_enabled)
 	{
+		return FALSE;
+	}
+
+	if (!(drv_ctx->cpu_flags & SSE4_2))
+	{
+		fprintf(stderr, "hybrid_drv_video: This CPU does not support SSE4.2!\r\n\
+			Likely you do not need this driver.\r\n");
 		return FALSE;
 	}
 
