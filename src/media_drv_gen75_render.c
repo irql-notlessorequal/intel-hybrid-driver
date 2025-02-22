@@ -1,5 +1,5 @@
 /*
- * Copyright © 2014 Intel Corporation
+ * Copyright ï¿½ 2014 Intel Corporation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -1453,7 +1453,7 @@ media_drv_gen75_render_init(VADriverContextP ctx)
 
     if (IS_HASWELL (drv_ctx->drv_data.device_id)) {
         memcpy(render_state->render_kernels, render_kernels_gen7_haswell,
-               sizeof(render_state->render_kernels));
+               sizeof(render_kernels_gen7_haswell));
         render_state->render_put_surface = gen7_render_put_surface;
         render_state->render_put_subpicture = gen7_render_put_subpicture;
     } else {

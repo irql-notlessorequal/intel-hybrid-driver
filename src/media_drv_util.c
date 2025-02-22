@@ -30,6 +30,7 @@
 #include "media_drv_data.h"
 #include "media_drv_driver.h"
 #include "media_drv_defines.h"
+
 BOOL
 media_drv_memcpy (VOID * dst_ptr, size_t dst_len, const VOID * src_ptr,
 		  size_t src_len)
