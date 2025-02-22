@@ -70,7 +70,7 @@ struct media_driver_data
   INT device_id;
   INT revision;
   dri_bufmgr *bufmgr;
-  INT dri2_enabled;
+  UINT dri2_enabled:1;
   UINT exec2_flag:1;	/* Flag: has execbuffer2? */
   UINT bsd_flag:1;	/* Flag: has bitstream decoder for H.264? */
   UINT blt_flag:1;	/* Flag: has BLT unit? */

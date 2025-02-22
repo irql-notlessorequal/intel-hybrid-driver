@@ -145,11 +145,10 @@ BOOL media_driver_init(VADriverContextP ctx)
 		return FALSE;
 	}
 
-	drv_ctx->locked = 0;
 	media_drv_mutex_init(&drv_ctx->ctxmutex);
-
 	media_drv_get_param(drv_ctx, I915_PARAM_CHIPSET_ID,
 						&drv_ctx->drv_data.device_id);
+
 	if (media_drv_get_param(drv_ctx, I915_PARAM_HAS_EXECBUF2, &has_exec2))
 		drv_ctx->drv_data.exec2_flag = has_exec2;
 	if (media_drv_get_param(drv_ctx, I915_PARAM_HAS_BSD, &has_bsd))

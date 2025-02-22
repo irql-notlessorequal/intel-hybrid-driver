@@ -232,7 +232,6 @@ typedef struct _media_drv_context
 	struct object_heap subpic_heap;
 	struct object_heap image_heap;
 	struct hw_codec_info *codec_info;
-	INT locked;
 	MEDIA_DRV_MUTEX ctxmutex;
 	MEDIA_BATCH_BUFFER *batch;
 	MEDIA_BATCH_BUFFER *pp_batch;
