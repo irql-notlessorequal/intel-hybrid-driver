@@ -30,7 +30,7 @@
 #include <wayland-client.h>
 #include <wayland-drm-client-protocol.h>
 #include "intel_driver.h"
-#include "i965_output_wayland.h"
+#include "media_drv_output_wayland.h"
 #include "i965_drv_video.h"
 #include "i965_defines.h"
 #include "dso_utils.h"
