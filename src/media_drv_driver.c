@@ -121,7 +121,7 @@ BOOL media_driver_init(VADriverContextP ctx)
 	{
 		char *env_str;
 		g_intel_debug_option_flags = 0;
-		if ((env_str = getenv("VA_INTEL_DEBUG")))
+		if ((env_str = getenv("VA_INTEL_HYBRID_DEBUG")))
 		{
 			char *debug_ptr = NULL;
 			debug_ptr = strstr(env_str, "0x");
@@ -160,6 +160,8 @@ BOOL media_driver_init(VADriverContextP ctx)
 
 	media_driver_get_revid(&drv_ctx->drv_data.revision);
 	media_drv_intel_bufmgr_init(drv_ctx);
+
+	verbose("hybrid_drv_video: Verbose logging enabled.\r\n");
 	return TRUE;
 }
 

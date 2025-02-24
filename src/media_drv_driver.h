@@ -209,6 +209,7 @@
 				 devid == PCI_CHIP_HASWELL_ULT_B_GT2 || \
 				 devid == PCI_CHIP_HASWELL_ULT_E_GT2)
 
+#define VA_INTEL_HYBRID_VERBOSE		(1 << 1)
 #define VA_INTEL_HYBRID_PRE_DUMP	(1 << 2)
 #define VA_INTEL_HYBRID_POST_DUMP	(1 << 3)
 
@@ -345,6 +346,19 @@ extern "C" {
 #endif
 
 extern uint32_t g_intel_debug_option_flags;
+
+static void verbose(const char *format, ...)
+{
+	if (!(g_intel_debug_option_flags & VA_INTEL_HYBRID_VERBOSE))
+	{
+		return;
+	}
+
+	va_list args;
+	va_start(args, format);
+	fprintf(stderr, format, args);
+	va_end(args);
+}
 
 #ifdef __cplusplus
 }

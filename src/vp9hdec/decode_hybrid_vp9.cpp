@@ -3270,14 +3270,20 @@ VAStatus Intel_HybridVp9Decode_HostVldRenderCb(
 	// Reset padding flag of current frame and update surface dimension
 	surface = SURFACE(pMdfDecodeFrame->ucCurrIndex);
 	if ((surface == NULL) || (surface->private_data == NULL))
+	{
+		verbose("[Intel_HybridVp9Decode_HostVldRenderCb] pMdfDecodeFrame->ucCurrIndex == NULL\r\n");
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
+	}
 
 	pFrameSource = (INTEL_DECODE_HYBRID_VP9_MDF_FRAME_SOURCE *)(surface->private_data);
 	pCurrFrame = &(pFrameSource->Frame);
 	pFrameSource->bHasPadding = false;
 
 	if (pCurrFrame->pMdfSurface == NULL)
+	{
+		verbose("[Intel_HybridVp9Decode_HostVldRenderCb] pCurrFrame->pMdfSurface == NULL\r\n");
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
+	}
 
 	pCurrFrame->pMdfSurface->SetSurfaceStateDimensions(
 		pMdfDecodeFrame->dwWidth,
@@ -3562,6 +3568,7 @@ static VAStatus codechal_allocate_frame_source(struct object_surface *surface)
 	if (pFrameSource == NULL)
 	{
 		eStatus = VA_STATUS_ERROR_ALLOCATION_FAILED;
+		verbose("[codechal_allocate_frame_source] pFrameSource == NULL\r\n");
 		return eStatus;
 	}
 
@@ -3666,7 +3673,10 @@ intel_hybrid_vp9_check_rendertarget(VADriverContextP ctx,
 	hybrid_vp9_hw_context *vp9_context = (hybrid_vp9_hw_context *)hw_context;
 
 	if (decode_state->current_render_target == VA_INVALID_SURFACE)
+	{
+		verbose("[intel_hybrid_vp9_check_rendertarget] decode_state->current_render_target is INVALID\r\n");
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
+	}
 
 	obj_surface = SURFACE(decode_state->current_render_target);
 
@@ -3694,6 +3704,7 @@ intel_hybrid_vp9_convert_picture(VADriverContextP ctx,
 
 	if (pPP == NULL)
 	{
+		verbose("[intel_hybrid_vp9_convert_picture] pPP == NULL\r\n");
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
 	}
 
@@ -3739,6 +3750,7 @@ intel_hybrid_vp9_convert_picture(VADriverContextP ctx,
 
 	if (pPP->first_partition_size == 0)
 	{
+		verbose("[intel_hybrid_vp9_convert_picture] pPP->first_partition_size == 0\r\n");
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
 	}
 	return VA_STATUS_SUCCESS;
@@ -3765,11 +3777,13 @@ intel_hybrid_vp9_convert_slice(VADriverContextP ctx,
 		if (decode_state->num_slice_params == 0)
 		{
 			/* there is no slice_param. */
+			verbose("[intel_hybrid_vp9_convert_slice] decode_state->num_slice_params == 0\r\n");
 			return VA_STATUS_ERROR_INVALID_PARAMETER;
 		}
 		if (decode_state->num_slice_params)
 		{
 			/* there are too many params */
+			verbose("[intel_hybrid_vp9_convert_slice] Too many slice parms, got %i\r\n", decode_state->num_slice_params);
 			return VA_STATUS_ERROR_MAX_NUM_EXCEEDED;
 		}
 	}
@@ -3779,6 +3793,7 @@ intel_hybrid_vp9_convert_slice(VADriverContextP ctx,
 	if (pSegData == NULL)
 	{
 		/* Null slice_parameter */
+		verbose("[intel_hybrid_vp9_convert_slice] pSegData == NULL\r\n");
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
 	}
 
@@ -3808,6 +3823,7 @@ intel_hybrid_vp9_convert_slice(VADriverContextP ctx,
 				  (uint32_t)pVp9PicParams->UncompressedHeaderLengthInBytes;
 	if (buffer_size >= pVp9PicParams->BSBytesInBuffer)
 	{
+		verbose("[intel_hybrid_vp9_convert_slice] BSBytesInBuffer overflowed! (size=%i,expected=%i)\r\n", buffer_size, pVp9PicParams->BSBytesInBuffer);
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
 	}
 	return VA_STATUS_SUCCESS;
