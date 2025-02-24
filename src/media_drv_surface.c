@@ -49,6 +49,23 @@ media_sync_surface(MEDIA_DRV_CONTEXT *drv_ctx, VASurfaceID render_target)
 	return VA_STATUS_SUCCESS;
 }
 
+VAStatus
+media_sync_surface2(MEDIA_DRV_CONTEXT *drv_ctx, VASurfaceID render_target, uint64_t timeout_ns)
+{
+
+	struct object_surface *obj_surface = SURFACE(render_target);
+
+	MEDIA_DRV_ASSERT(obj_surface);
+
+	if (obj_surface->bo)
+	{
+		if (drm_intel_gem_bo_wait(obj_surface->bo, timeout_ns) != 0)
+			return VA_STATUS_ERROR_TIMEDOUT;
+	}
+
+	return VA_STATUS_SUCCESS;
+}
+
 static VAStatus
 media_suface_external_memory(VADriverContextP ctx,
 							 struct object_surface *obj_surface,

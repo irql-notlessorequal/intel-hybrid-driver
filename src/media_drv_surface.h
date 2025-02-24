@@ -282,9 +282,14 @@ typedef struct gen7_surface_state2
 		UINT pad0;
 	} ss7;
 } SURFACE_STATE_ADV_G7;
+
 VOID media_destroy_surface(struct object_heap *heap, struct object_base *obj);
+
 VAStatus
 media_sync_surface(MEDIA_DRV_CONTEXT *drv_ctx, VASurfaceID render_target);
+
+VAStatus
+media_sync_surface2(MEDIA_DRV_CONTEXT *drv_ctx, VASurfaceID render_target, uint64_t timeout_ns);
 
 #ifdef __cplusplus
 extern "C"
