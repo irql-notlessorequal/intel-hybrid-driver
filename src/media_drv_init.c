@@ -39,6 +39,7 @@
 #include "media_drv_driver.h"
 #include "media_drv_init.h"
 #include "media_drv_decoder.h"
+#include "media_drv_fourcc.h"
 
 // #define DEBUG
 #define DEFAULT_BRIGHTNESS 0
@@ -194,14 +195,23 @@ media_CreateSurfaces2(VADriverContextP ctx,
 
 	if (num_surfaces == 0 || surfaces == NULL || width == 0 || height == 0 || (num_attribs > 0 && attrib_list == NULL))
 	{
-		printf("media_CreateSurfaces2:VA_STATUS_ERROR_INVALID_PARAMETER");
+		verbose("[media_CreateSurfaces2] Invalid surface configuration!\r\n");
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
 	}
+
 	/*FIXME:Make sure that we supported only the set of format mentioned below */
-	if (VA_RT_FORMAT_YUV420 != format && VA_RT_FORMAT_YUV422 != format && VA_RT_FORMAT_YUV444 != format && VA_RT_FORMAT_YUV411 != format && VA_RT_FORMAT_YUV400 != format && VA_RT_FORMAT_RGB32 != format && VA_FOURCC_NV12 != format && VA_FOURCC_P208 != format)
+	if (VA_RT_FORMAT_YUV420 != format && 
+		VA_RT_FORMAT_YUV422 != format && 
+		VA_RT_FORMAT_YUV444 != format && 
+		VA_RT_FORMAT_YUV411 != format && 
+		VA_RT_FORMAT_YUV400 != format && 
+		VA_RT_FORMAT_RGB32 != format && 
+		VA_FOURCC_NV12 != format && 
+		VA_FOURCC_P208 != format)
 	{
 		return VA_STATUS_ERROR_UNSUPPORTED_RT_FORMAT;
 	}
+
 	expected_fourcc = format_to_fourcc(format);
 	for (i = 0; i < num_attribs && attrib_list; i++)
 	{
@@ -240,7 +250,7 @@ media_CreateSurfaces2(VADriverContextP ctx,
 				break;
 
 			default:
-				printf("media_CreateSurface2:attrib type not supported\n");
+				verbose("[media_CreateSurfaces2] Unknown configuration attribute: %i", attrib_list[i].type);
 				break;
 			}
 		}
@@ -1673,19 +1683,15 @@ media_encoder_render_picture(VADriverContextP ctx,
 																  obj_buffer);
 			break;
 		case VAEncMiscParameterTypeVP8SegmentMapParams:
-#ifdef DEBUG
-			printf("VAEncMiscParameterTypeVP8SegmentMapParams:\n");
-#endif
+			verbose("[media_encoder_render_picture] VAEncMiscParameterTypeVP8SegmentMapParams\r\n");
 			break;
 		case VAEncMiscParameterTypeVP8HybridFrameUpdate:
 			vaStatus = MEDIA_RENDER_ENCODE_BUFFER(frame_update);
-#ifdef DEBUG
-			printf("VAEncHackTypeVP8HybridFrameUpdate\n");
-#endif
+			verbose("[media_encoder_render_picture] VAEncMiscParameterTypeVP8HybridFrameUpdate\r\n");
 			break;
 
 		default:
-			printf("media_encoder_render_picture error:VA_STATUS_ERROR_UNSUPPORTED_BUFFERTYPE obj_buffer->type=%d\n",
+			verbose("[media_encoder_render_picture] VA_STATUS_ERROR_UNSUPPORTED_BUFFERTYPE (obj_buffer->type=%d)\n",
 				   obj_buffer->type);
 			vaStatus = VA_STATUS_ERROR_UNSUPPORTED_BUFFERTYPE;
 			break;
@@ -2037,27 +2043,32 @@ media_CreateContext(VADriverContextP ctx, VAConfigID config_id, INT picture_widt
 	MEDIA_DRV_ASSERT(drv_ctx);
 	render_state = &drv_ctx->render_state;
 	obj_config = CONFIG(config_id);
+
 	if (NULL == obj_config)
 	{
-		printf("media_CreateContext obj_config==NULL\n");
 		status = VA_STATUS_ERROR_INVALID_CONFIG;
+		verbose("[media_CreateContext] obj_config == NULL\r\n");
 		return status;
 	}
+
 	if (picture_width > drv_ctx->codec_info->max_width ||
 		picture_height > drv_ctx->codec_info->max_height)
 	{
 		status = VA_STATUS_ERROR_RESOLUTION_NOT_SUPPORTED;
 		return status;
 	}
+
 	/* Validate flag */
 	/* Validate picture dimensions */
 	contextID = NEW_CONTEXT_ID();
 	obj_context = CONTEXT(contextID);
+
 	if (NULL == obj_context)
 	{
 		status = VA_STATUS_ERROR_ALLOCATION_FAILED;
 		return status;
 	}
+
 	render_state->interleaved_uv = 1;
 
 	status = media_validate_config(ctx, obj_config->profile, obj_config->entrypoint);
@@ -2140,12 +2151,15 @@ media_DestroySurfaces(VADriverContextP ctx,
 	INT i;
 	MEDIA_DRV_CONTEXT *drv_ctx;
 	MEDIA_DRV_ASSERT(ctx);
+
 	if (num_surfaces == 0 || surface_list == NULL)
 	{
-		printf("media_DestroySurfaces:VA_STATUS_ERROR_INVALID_PARAMETER");
+		verbose("[media_DestroySurfaces] Missing surfaces or surface list!");
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
 	}
+
 	drv_ctx = (MEDIA_DRV_CONTEXT *)ctx->pDriverData;
+
 	for (i = num_surfaces; i--;)
 	{
 		struct object_surface *obj_surface = SURFACE(surface_list[i]);
@@ -2538,6 +2552,264 @@ media_display_attributes_terminate(VADriverContextP ctx)
 	}
 }
 
+static VAStatus
+media_drv_ExportSurfaceHandle(VADriverContextP ctx, VASurfaceID surface_id,
+                         uint32_t mem_type, uint32_t flags,
+                         void *descriptor)
+{
+	MEDIA_DRV_CONTEXT *drv_ctx = NULL;
+	MEDIA_DRV_ASSERT(ctx);
+	drv_ctx = ctx->pDriverData;
+	MEDIA_DRV_ASSERT(drv_ctx);
+
+    struct object_surface *obj_surface = SURFACE(surface_id);
+    const i965_fourcc_info *info;
+    unsigned int tiling, swizzle;
+    uint32_t formats[4], pitch, height, offset, y_offset;
+    int fd, p;
+    int composite_object = flags & VA_EXPORT_SURFACE_COMPOSED_LAYERS;
+
+    if (!obj_surface || !obj_surface->bo)
+	{
+		verbose("vaExportSurfaceHandle: Attempted to export unknown surface %08x.\n", surface_id);
+		return VA_STATUS_ERROR_INVALID_SURFACE;
+	}
+
+    if (mem_type != VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2 && mem_type != VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_3)
+	{
+        verbose("vaExportSurfaceHandle: memory type %08x is not supported.\n", mem_type);
+        return VA_STATUS_ERROR_UNSUPPORTED_MEMORY_TYPE;
+    }
+
+	info = get_fourcc_info(obj_surface->fourcc);
+    if (!info)
+		return VA_STATUS_ERROR_UNSUPPORTED_RT_FORMAT;
+
+	if (composite_object)
+	{
+		formats[0] =
+			drm_format_of_composite_object(obj_surface->fourcc);
+		if (!formats[0])
+		{
+			verbose("vaExportSurfaceHandle: fourcc %08x "
+				"is not supported for export as a composite "
+				"object.\n", obj_surface->fourcc);
+			return VA_STATUS_ERROR_INVALID_SURFACE;
+		}
+	}
+	else
+	{
+		for (p = 0; p < info->num_planes; p++)
+		{
+			formats[p] =
+				drm_format_of_separate_plane(obj_surface->fourcc, p);
+			if (!formats[p])
+			{
+				verbose("vaExportSurfaceHandle: fourcc %08x "
+					"is not supported for export as separate "
+					"planes.\n", obj_surface->fourcc);
+				return VA_STATUS_ERROR_INVALID_SURFACE;
+			}
+		}
+	}
+
+    if (drm_intel_bo_gem_export_to_prime(obj_surface->bo, &fd))
+        return VA_STATUS_ERROR_INVALID_SURFACE;
+
+	if (drm_intel_bo_get_tiling(obj_surface->bo, &tiling, &swizzle))
+        tiling = I915_TILING_NONE;
+
+	if (mem_type == VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2)
+	{
+		VADRMPRIMESurfaceDescriptor *desc = (VADRMPRIMESurfaceDescriptor *)descriptor;
+
+		/* Chromium doesn't seem to safely init the struct, this can cause memory corruption. */
+		memset(desc, 0, sizeof(VADRMPRIMESurfaceDescriptor));
+
+		desc->fourcc = obj_surface->fourcc;
+		desc->width = obj_surface->orig_width;
+		desc->height = obj_surface->orig_height;
+
+		desc->num_objects = 1;
+		desc->objects[0].fd = fd;
+		desc->objects[0].size = obj_surface->size;
+		switch (tiling)
+		{
+		case I915_TILING_X:
+			desc->objects[0].drm_format_modifier = I915_FORMAT_MOD_X_TILED;
+			break;
+		case I915_TILING_Y:
+			desc->objects[0].drm_format_modifier = I915_FORMAT_MOD_Y_TILED;
+			break;
+		case I915_TILING_NONE:
+		default:
+			desc->objects[0].drm_format_modifier = DRM_FORMAT_MOD_NONE;
+		}
+
+		if (composite_object)
+		{
+			desc->num_layers = 1;
+
+			desc->layers[0].drm_format = formats[0];
+			desc->layers[0].num_planes = info->num_planes;
+
+			offset = 0;
+			for (p = 0; p < info->num_planes; p++)
+			{
+				desc->layers[0].object_index[p] = 0;
+
+				if (p == 0)
+				{
+					pitch = obj_surface->width;
+					height = obj_surface->height;
+				}
+				else
+				{
+					pitch = obj_surface->cb_cr_pitch;
+					height = obj_surface->cb_cr_height;
+				}
+
+				desc->layers[0].offset[p] = offset;
+				desc->layers[0].pitch[p] = pitch;
+
+				offset += pitch * height;
+			}
+		}
+		else
+		{
+			desc->num_layers = info->num_planes;
+
+			offset = 0;
+			for (p = 0; p < info->num_planes; p++)
+			{
+				desc->layers[p].drm_format = formats[p];
+				desc->layers[p].num_planes = 1;
+
+				desc->layers[p].object_index[0] = 0;
+
+				if (p == 0)
+				{
+					pitch = obj_surface->width;
+					height = obj_surface->height;
+					if (obj_surface->y_cb_offset < obj_surface->y_cr_offset)
+						y_offset = obj_surface->y_cb_offset;
+					else
+						y_offset = obj_surface->y_cr_offset;
+				}
+				else
+				{
+					if (obj_surface->y_cb_offset < obj_surface->y_cr_offset)
+						y_offset = obj_surface->y_cr_offset;
+					else
+						y_offset = obj_surface->y_cb_offset;
+					pitch = obj_surface->cb_cr_pitch;
+					height = obj_surface->cb_cr_height;
+				}
+
+				desc->layers[p].offset[0] = offset;
+				desc->layers[p].pitch[0] = pitch;
+				offset = obj_surface->width * y_offset;
+			}
+		}
+	}
+	else
+	{
+		VADRMPRIME3SurfaceDescriptor *desc = (VADRMPRIME3SurfaceDescriptor *)descriptor;
+
+		/* Chromium doesn't seem to safely init the struct, this can cause memory corruption. */
+		memset(desc, 0, sizeof(VADRMPRIME3SurfaceDescriptor));
+
+		desc->fourcc = obj_surface->fourcc;
+		desc->width = obj_surface->orig_width;
+		desc->height = obj_surface->orig_height;
+		desc->flags = 0;
+
+		desc->num_objects = 1;
+		desc->objects[0].fd = fd;
+		desc->objects[0].size = obj_surface->size;
+		switch (tiling)
+		{
+		case I915_TILING_X:
+			desc->objects[0].drm_format_modifier = I915_FORMAT_MOD_X_TILED;
+			break;
+		case I915_TILING_Y:
+			desc->objects[0].drm_format_modifier = I915_FORMAT_MOD_Y_TILED;
+			break;
+		case I915_TILING_NONE:
+		default:
+			desc->objects[0].drm_format_modifier = DRM_FORMAT_MOD_NONE;
+		}
+
+		if (composite_object)
+		{
+			desc->num_layers = 1;
+
+			desc->layers[0].drm_format = formats[0];
+			desc->layers[0].num_planes = info->num_planes;
+
+			offset = 0;
+			for (p = 0; p < info->num_planes; p++)
+			{
+				desc->layers[0].object_index[p] = 0;
+
+				if (p == 0)
+				{
+					pitch = obj_surface->width;
+					height = obj_surface->height;
+				}
+				else
+				{
+					pitch = obj_surface->cb_cr_pitch;
+					height = obj_surface->cb_cr_height;
+				}
+
+				desc->layers[0].offset[p] = offset;
+				desc->layers[0].pitch[p] = pitch;
+
+				offset += pitch * height;
+			}
+		}
+		else
+		{
+			desc->num_layers = info->num_planes;
+
+			offset = 0;
+			for (p = 0; p < info->num_planes; p++)
+			{
+				desc->layers[p].drm_format = formats[p];
+				desc->layers[p].num_planes = 1;
+
+				desc->layers[p].object_index[0] = 0;
+
+				if (p == 0)
+				{
+					pitch = obj_surface->width;
+					height = obj_surface->height;
+					if (obj_surface->y_cb_offset < obj_surface->y_cr_offset)
+						y_offset = obj_surface->y_cb_offset;
+					else
+						y_offset = obj_surface->y_cr_offset;
+				}
+				else
+				{
+					if (obj_surface->y_cb_offset < obj_surface->y_cr_offset)
+						y_offset = obj_surface->y_cr_offset;
+					else
+						y_offset = obj_surface->y_cb_offset;
+					pitch = obj_surface->cb_cr_pitch;
+					height = obj_surface->cb_cr_height;
+				}
+
+				desc->layers[p].offset[0] = offset;
+				desc->layers[p].pitch[0] = pitch;
+				offset = obj_surface->width * y_offset;
+			}
+		}
+	}
+
+    return VA_STATUS_SUCCESS;
+}
+
 static BOOL
 media_display_attributes_init(VADriverContextP ctx)
 {
@@ -2726,6 +2998,10 @@ va_driver_init(VADriverContextP ctx)
 #if VA_CHECK_VERSION(0, 36, 0)
 	vtable->vaAcquireBufferHandle = media_drv_AcquireBufferHandle;
 	vtable->vaReleaseBufferHandle = media_drv_ReleaseBufferHandle;
+#endif
+
+#if VA_CHECK_VERSION(1, 0, 0)
+	vtable->vaExportSurfaceHandle = media_drv_ExportSurfaceHandle;
 #endif
 
 	ret = media_drv_init(ctx);
