@@ -2628,11 +2628,11 @@ media_drv_ExportSurfaceHandle(VADriverContextP ctx, VASurfaceID surface_id,
 		}
 	}
 
-    if (drm_intel_bo_gem_export_to_prime(obj_surface->bo, &fd))
-        return VA_STATUS_ERROR_INVALID_SURFACE;
+	if (drm_intel_bo_gem_export_to_prime(obj_surface->bo, &fd))
+		return VA_STATUS_ERROR_INVALID_SURFACE;
 
 	if (drm_intel_bo_get_tiling(obj_surface->bo, &tiling, &swizzle))
-        tiling = I915_TILING_NONE;
+		tiling = I915_TILING_NONE;
 
 	if (mem_type == VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2)
 	{
