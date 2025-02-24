@@ -1117,6 +1117,7 @@ VAStatus Intel_HybridVp9Decode_MdfHost_CreateKernels(
 	}
 	else
 	{
+		verbose("[Intel_HybridVp9Decode_MdfHost_CreateKernels] Unable to find TRANSFORM kernel for hardware.\r\n");
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
 	}
 
@@ -1156,6 +1157,7 @@ VAStatus Intel_HybridVp9Decode_MdfHost_CreateKernels(
 	}
 	else
 	{
+		verbose("[Intel_HybridVp9Decode_MdfHost_CreateKernels] Unable to find INTRA_PRED kernel for hardware.\r\n");
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
 	}
 
@@ -1195,6 +1197,7 @@ VAStatus Intel_HybridVp9Decode_MdfHost_CreateKernels(
 	}
 	else
 	{
+		verbose("[Intel_HybridVp9Decode_MdfHost_CreateKernels] Unable to find INTER_PRED kernel for hardware.\r\n");
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
 	}
 
@@ -1233,6 +1236,7 @@ VAStatus Intel_HybridVp9Decode_MdfHost_CreateKernels(
 	}
 	else
 	{
+		verbose("[Intel_HybridVp9Decode_MdfHost_CreateKernels] Unable to find INTER_PRED_SCALING kernel for hardware.\r\n");
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
 	}
 
@@ -1263,6 +1267,7 @@ VAStatus Intel_HybridVp9Decode_MdfHost_CreateKernels(
 	}
 	else
 	{
+		verbose("[Intel_HybridVp9Decode_MdfHost_CreateKernels] Unable to find DEBLOCK kernel for hardware.\r\n");
 		return VA_STATUS_ERROR_INVALID_PARAMETER;
 	}
 
@@ -1357,6 +1362,7 @@ VAStatus Intel_HybridVp9Decode_MdfHost_CreateThreadSpaces(
 		break;
 	default:
 		eStatus = VA_STATUS_ERROR_UNKNOWN;
+		verbose("[Intel_HybridVp9Decode_MdfHost_CreateThreadSpaces] Couldn't handle dwIntraPredKernelModeLuma correctly.\r\n");
 		goto finish;
 	}
 
@@ -1393,6 +1399,7 @@ VAStatus Intel_HybridVp9Decode_MdfHost_CreateThreadSpaces(
 		break;
 	default:
 		eStatus = VA_STATUS_ERROR_UNKNOWN;
+		verbose("[Intel_HybridVp9Decode_MdfHost_CreateThreadSpaces] Couldn't handle dwIntraPredKernelModeChroma correctly.\r\n");
 		goto finish;
 	}
 
@@ -1872,6 +1879,7 @@ VAStatus Intel_HybridVp9Decode_MdfHost_Create(
 		cm_status = CreateCmDevice(pMdfDevice, cm_version, &driver_context, CM_DEVICE_CREATE_OPTION_FOR_VP9);
 		if (cm_status != CM_SUCCESS)
 		{
+			verbose("[Intel_HybridVp9Decode_MdfHost_Create] CreateCmDevice failed.\r\n");
 			return VA_STATUS_ERROR_ALLOCATION_FAILED;
 		}
 

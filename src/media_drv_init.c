@@ -449,31 +449,6 @@ enum
 	MEDIA_SURFACETYPE_YUV,
 	MEDIA_SURFACETYPE_INDEXED
 };
-static const media_subpic_format_map_t
-	media_subpic_formats_map[2] = {
-		{MEDIA_SURFACETYPE_RGBA, MEDIA_SURFACEFORMAT_B8G8R8A8_UNORM, {VA_FOURCC_BGRA, VA_LSB_FIRST, 32, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000}, COMMON_SUBPICTURE_FLAGS},
-		{MEDIA_SURFACETYPE_RGBA, MEDIA_SURFACEFORMAT_R8G8B8A8_UNORM, {VA_FOURCC_RGBA, VA_LSB_FIRST, 32, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000}, COMMON_SUBPICTURE_FLAGS},
-};
-
-static const media_subpic_format_map_t *
-get_subpic_format(const VAImageFormat *va_format)
-{
-	unsigned int i;
-
-	for (i = 0; media_subpic_formats_map[i].type != 0; i++)
-	{
-		const media_subpic_format_map_t *const m = &media_subpic_formats_map[i];
-		if (m->va_format.fourcc == va_format->fourcc &&
-			(m->type == MEDIA_SURFACETYPE_RGBA ? (m->va_format.byte_order == va_format->byte_order &&
-												  m->va_format.red_mask == va_format->red_mask &&
-												  m->va_format.green_mask == va_format->green_mask &&
-												  m->va_format.blue_mask == va_format->blue_mask &&
-												  m->va_format.alpha_mask == va_format->alpha_mask)
-											   : 1))
-			return m;
-	}
-	return NULL;
-}
 
 VAStatus
 media_DeassociateSubpicture(VADriverContextP ctx,
@@ -616,32 +591,7 @@ media_DestroySubpicture(VADriverContextP ctx, VASubpictureID subpicture)
 VAStatus
 media_CreateSubpicture(VADriverContextP ctx, VAImageID image, VASubpictureID *subpicture) /* out */
 {
-	MEDIA_DRV_CONTEXT *drv_ctx = (MEDIA_DRV_CONTEXT *)ctx->pDriverData;
-	VASubpictureID subpicID = NEW_SUBPIC_ID() struct object_subpic *obj_subpic = SUBPIC(subpicID);
-	struct object_image *obj_image;
-
-	if (!obj_subpic)
-		return VA_STATUS_ERROR_ALLOCATION_FAILED;
-
-	obj_image = IMAGE(image);
-	if (!obj_image)
-		return VA_STATUS_ERROR_INVALID_IMAGE;
-
-	const media_subpic_format_map_t *const m = get_subpic_format(&obj_image->image.format);
-	if (!m)
-		return VA_STATUS_ERROR_UNKNOWN; /* XXX: VA_STATUS_ERROR_UNSUPPORTED_FORMAT? */
-
-	*subpicture = subpicID;
-	obj_subpic->image = image;
-	obj_subpic->obj_image = obj_image;
-	obj_subpic->format = m->format;
-	obj_subpic->width = obj_image->image.width;
-	obj_subpic->height = obj_image->image.height;
-	obj_subpic->pitch = obj_image->image.pitches[0];
-	obj_subpic->bo = obj_image->bo;
-	obj_subpic->global_alpha = 1.0;
-
-	return VA_STATUS_SUCCESS;
+	return VA_STATUS_ERROR_UNIMPLEMENTED;
 }
 
 VAStatus
@@ -1284,29 +1234,52 @@ typedef struct
 	VAImageFormat va_format;
 } media_image_format_map_t;
 
-static const media_image_format_map_t
-	media_image_formats_map[MEDIA_GEN_MAX_IMAGE_FORMATS + 1] = {
-		{MEDIA_SURFACETYPE_RGBA,
-		 {VA_FOURCC_RGBX, VA_LSB_FIRST, 32, 24, 0x000000ff, 0x0000ff00, 0x00ff0000}},
-		{MEDIA_SURFACETYPE_RGBA,
-		 {VA_FOURCC_BGRX, VA_LSB_FIRST, 32, 24, 0x00ff0000, 0x0000ff00, 0x000000ff}},
+static const media_image_format_map_t media_image_formats_map[MEDIA_GEN_MAX_IMAGE_FORMATS + 1] = {
+	{
+		/* [31:0] A:R:G:B 8:8:8:8 little endian */
+		MEDIA_SURFACETYPE_RGBA,
+		{ VA_FOURCC_BGRA, VA_LSB_FIRST, 32, 32, 0x00ff0000, 0x0000ff00, 0x000000ff,  0xff000000 }
+	},
+	{
+		/* [31:0] X:B:G:R 8:8:8:8 little endian */
+		MEDIA_SURFACETYPE_RGBA,
+		{ VA_FOURCC_RGBX, VA_LSB_FIRST, 32, 24, 0x000000ff, 0x0000ff00, 0x00ff0000 }
+	},
+	{
+		/* [31:0] X:R:G:B 8:8:8:8 little endian */
+		MEDIA_SURFACETYPE_RGBA,
+		{ VA_FOURCC_BGRX, VA_LSB_FIRST, 32, 24, 0x00ff0000, 0x0000ff00, 0x000000ff }
+	},
+	{
+		/* [31:0] A:B:G:R 8:8:8:8 little endian */
+		MEDIA_SURFACETYPE_RGBA,
+		{ VA_FOURCC_RGBA, VA_LSB_FIRST, 32, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000 }
+	},
+	{
+		MEDIA_SURFACETYPE_YUV,
+		{ VA_FOURCC_NV12, VA_LSB_FIRST, 12, }
+	},
 };
 
 VAStatus
 media_QueryImageFormats(VADriverContextP ctx, VAImageFormat *format_list, /* out */
 						INT *num_formats)								  /* out */
 {
-	int n;
+	if (!ctx)
+		return VA_STATUS_ERROR_INVALID_CONTEXT;
+
+	int n, idx = 0;
 
 	for (n = 0; media_image_formats_map[n].va_format.fourcc != 0; n++)
 	{
-		const media_image_format_map_t *const m = &media_image_formats_map[n];
+		const media_image_format_map_t * const m = &media_image_formats_map[n];
+
 		if (format_list)
-			format_list[n] = m->va_format;
+			format_list[idx++] = m->va_format;
 	}
 
 	if (num_formats)
-		*num_formats = n;
+		*num_formats = idx;
 
 	return VA_STATUS_SUCCESS;
 }
