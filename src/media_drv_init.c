@@ -3119,7 +3119,7 @@ va_driver_init(VADriverContextP ctx)
 	vtable->vaExportSurfaceHandle = media_drv_ExportSurfaceHandle;
 #endif
 
-#if VA_CHECK_VERSION(1, 0, 0)
+#if VA_CHECK_VERSION(1, 9, 0)
 	vtable->vaSyncSurface2 = media_SyncSurface2;
 #endif
 
