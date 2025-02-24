@@ -181,7 +181,6 @@ media_CreateSurfaces2(VADriverContextP ctx,
 					  UINT num_surfaces,
 					  VASurfaceAttrib *attrib_list, UINT num_attribs)
 {
-	// VAStatus vaStatus = VA_STATUS_SUCCESS;
 	INT i = 0;
 	INT expected_fourcc;
 	INT memory_type = I965_SURFACE_MEM_NATIVE; /* native */
@@ -207,7 +206,8 @@ media_CreateSurfaces2(VADriverContextP ctx,
 		VA_RT_FORMAT_YUV400 != format && 
 		VA_RT_FORMAT_RGB32 != format && 
 		VA_FOURCC_NV12 != format && 
-		VA_FOURCC_P208 != format)
+		VA_FOURCC_P208 != format &&
+		VA_RT_FORMAT_YUV420_10BPP == format)
 	{
 		return VA_STATUS_ERROR_UNSUPPORTED_RT_FORMAT;
 	}
@@ -2484,29 +2484,44 @@ VAStatus
 media_QueryConfigEntrypoints(VADriverContextP ctx, VAProfile profile, VAEntrypoint *entrypoint_list, /* out */
 							 INT *num_entrypoints)													 /* out */
 {
+	if (!ctx)
+		return VA_STATUS_ERROR_INVALID_CONTEXT;
+
 	MEDIA_DRV_CONTEXT *drv_ctx = (MEDIA_DRV_CONTEXT *)(ctx->pDriverData);
 	INT index = 0;
+
 	switch (profile)
 	{
+
 	case VAProfileVP8Version0_3:
 		if (drv_ctx->codec_info->vp8_enc_hybrid_support)
 		{
 			entrypoint_list[index++] = (VAEntrypoint)VAEntrypointEncSlice;
 		}
 		break;
+
 	case VAProfileVP9Profile0:
 		if (drv_ctx->codec_info->vp9_dec_hybrid_support)
 		{
 			entrypoint_list[index++] = (VAEntrypoint)VAEntrypointVLD;
 		}
 		break;
+
 	default:
-		// printf ("Unsupported profile\n");
 		break;
 	}
+
 	MEDIA_DRV_ASSERT(index <= MEDIA_GEN_MAX_ENTRYPOINTS);
 	*num_entrypoints = index;
-	return index > 0 ? VA_STATUS_SUCCESS : VA_STATUS_ERROR_UNSUPPORTED_PROFILE;
+	/**
+	 * While this is technically correct, most VAAPI drivers will just return
+	 * VA_STATUS_SUCCESS even if no profiles are available.
+	 */
+#if defined(I965_USE_LEGACY_QUERY_LOGIC)
+	return n > 0 ? VA_STATUS_SUCCESS : VA_STATUS_ERROR_UNSUPPORTED_PROFILE;
+#else
+	return VA_STATUS_SUCCESS;
+#endif
 }
 
 MEDIA_DRV_CONTEXT *
