@@ -52,14 +52,50 @@ media_sync_surface(MEDIA_DRV_CONTEXT *drv_ctx, VASurfaceID render_target)
 VAStatus
 media_sync_surface2(MEDIA_DRV_CONTEXT *drv_ctx, VASurfaceID render_target, uint64_t timeout_ns)
 {
-
 	struct object_surface *obj_surface = SURFACE(render_target);
-
 	MEDIA_DRV_ASSERT(obj_surface);
+
+	/**
+	 * We need to workaround a kernel limitation for DRM_IOCTL_I915_GEM_WAIT.
+	 * Treat really large values as an infinite timeout.
+	 */
+	int64_t timeout = timeout_ns;
+	if (timeout_ns >= MEDIA_MAXIMUM_KERNEL_TIMEOUT)
+	{
+		timeout = MEDIA_INFINITE_KERNEL_TIMEOUT;
+	}
 
 	if (obj_surface->bo)
 	{
-		if (drm_intel_gem_bo_wait(obj_surface->bo, timeout_ns) != 0)
+		if (drm_intel_gem_bo_wait(obj_surface->bo, timeout) != 0)
+			return VA_STATUS_ERROR_TIMEDOUT;
+	}
+
+	return VA_STATUS_SUCCESS;
+}
+
+VAStatus
+media_sync_buffer(MEDIA_DRV_CONTEXT *drv_ctx, VABufferID buf_id, uint64_t timeout_ns)
+{
+	struct object_buffer *obj_buffer = BUFFER(buf_id);
+	if (!obj_buffer)
+		return VA_STATUS_ERROR_INVALID_BUFFER;
+
+	/**
+	 * The kernel expects a negative value as an infinite timeout, enforce that.
+	 * 
+	 * We also need to workaround a kernel limitation for DRM_IOCTL_I915_GEM_WAIT,
+	 * treat really large values as an infinite timeout.
+	 */
+	int64_t timeout = timeout_ns;
+	if (timeout_ns >= MEDIA_MAXIMUM_KERNEL_TIMEOUT)
+	{
+		timeout = MEDIA_INFINITE_KERNEL_TIMEOUT;
+	}
+
+	if (obj_buffer->buffer_store->bo)
+	{
+		if (drm_intel_gem_bo_wait(obj_buffer->buffer_store->bo, timeout) != 0)
 			return VA_STATUS_ERROR_TIMEDOUT;
 	}
 

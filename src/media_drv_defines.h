@@ -58,6 +58,9 @@
 #define MEDIA_GEN_MAX_DISPLAY_ATTRIBUTES       4	// Use the same value as I965
 #define MEDIA_GEN_MAX_ATTRIBS_TYPE             4	//VAConfigAttribRTFormat,    VAConfigAttribRateControl,    VAConfigAttribDecSliceMode,    VAConfigAttribEncPackedHeaders
 
+#define MEDIA_INFINITE_KERNEL_TIMEOUT			-1
+#define MEDIA_MAXIMUM_KERNEL_TIMEOUT			0x8000000000000000
+
 //
 #define I965_MAX_SUBPIC_SUM                     4
 

@@ -1443,19 +1443,18 @@ media_SyncSurface2(VADriverContextP ctx, VASurfaceID render_target, uint64_t tim
 	MEDIA_DRV_CONTEXT *drv_ctx;
 	MEDIA_DRV_ASSERT(ctx);
 	drv_ctx = (MEDIA_DRV_CONTEXT *)ctx->pDriverData;
-	
-	if (timeout_ns == VA_TIMEOUT_INFINITE)
-	{
-		/**
-		 * There is no limit set, use the legacy path instead.
-		 */
-		status = media_sync_surface(drv_ctx, render_target);	
-	}
-	else
-	{
-		status = media_sync_surface2(drv_ctx, render_target, timeout_ns);
-	}
+	status = media_sync_surface2(drv_ctx, render_target, timeout_ns);
+	return status;
+}
 
+VAStatus
+media_SyncBuffer(VADriverContextP ctx, VABufferID buf_id, uint64_t timeout_ns)
+{
+	VAStatus status;
+	MEDIA_DRV_CONTEXT *drv_ctx;
+	MEDIA_DRV_ASSERT(ctx);
+	drv_ctx = (MEDIA_DRV_CONTEXT *)ctx->pDriverData;
+	status = media_sync_buffer(drv_ctx, buf_id, timeout_ns);
 	return status;
 }
 
@@ -3120,6 +3119,7 @@ va_driver_init(VADriverContextP ctx)
 #endif
 
 #if VA_CHECK_VERSION(1, 9, 0)
+	vtable->vaSyncBuffer = media_SyncBuffer;
 	vtable->vaSyncSurface2 = media_SyncSurface2;
 #endif
 

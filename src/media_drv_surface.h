@@ -291,6 +291,9 @@ media_sync_surface(MEDIA_DRV_CONTEXT *drv_ctx, VASurfaceID render_target);
 VAStatus
 media_sync_surface2(MEDIA_DRV_CONTEXT *drv_ctx, VASurfaceID render_target, uint64_t timeout_ns);
 
+VAStatus
+media_sync_buffer(MEDIA_DRV_CONTEXT *drv_ctx, VABufferID buf_id, uint64_t timeout_ns);
+
 #ifdef __cplusplus
 extern "C"
 {
