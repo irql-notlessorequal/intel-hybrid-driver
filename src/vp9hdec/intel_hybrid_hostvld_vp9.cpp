@@ -384,6 +384,7 @@ VAStatus Intel_HostvldVp9_PreParser (PVOID pVp9FrameState)
 	if (0 != iMarkerBit)
 	{
 		eStatus = VA_STATUS_ERROR_OPERATION_FAILED;
+		verbose("[Intel_HostvldVp9_PreParser] (ERROR) iMarkerBit != 0\r\n");
 		goto finish;
 	}
 	

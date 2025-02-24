@@ -66,37 +66,35 @@
 #include "intel_hybrid_hostvld_vp9_engine.h"
 
 #define VP9_DIFF_UPDATE_PROB 252
-#define VP9_NMV_UPDATE_PROB  252
-#define VP9_SUBEXP_PARAM     4   /* Subexponential code parameter */
+#define VP9_NMV_UPDATE_PROB 252
+#define VP9_SUBEXP_PARAM 4 /* Subexponential code parameter */
 
-#define VP9_COEFF_COUNT_SAT                     24
-#define VP9_COEFF_MAX_UPDATE_FACTOR             112
-#define VP9_COEFF_COUNT_SAT_KEY                 24
-#define VP9_COEFF_MAX_UPDATE_FACTOR_KEY         112
-#define VP9_COEFF_COUNT_SAT_AFTER_KEY           24
-#define VP9_COEFF_MAX_UPDATE_FACTOR_AFTER_KEY   128
+#define VP9_COEFF_COUNT_SAT 24
+#define VP9_COEFF_MAX_UPDATE_FACTOR 112
+#define VP9_COEFF_COUNT_SAT_KEY 24
+#define VP9_COEFF_MAX_UPDATE_FACTOR_KEY 112
+#define VP9_COEFF_COUNT_SAT_AFTER_KEY 24
+#define VP9_COEFF_MAX_UPDATE_FACTOR_AFTER_KEY 128
 
-#define VP9_NODE_LEFT                           0
-#define VP9_NODE_RIGHT                          1
+#define VP9_NODE_LEFT 0
+#define VP9_NODE_RIGHT 1
 
 #define VP9_COUNT_SAT 20
 #define VP9_MAX_UPDATE_FACTOR 128
 
-#define INTEL_VP9_RECENTER(v, m)          (((v) > ((m) << 1)) ? (v) : ((v) % 2 ? (m) - (((v) + 1) >> 1) : (m) + ((v) >> 1)))
-#define INTEL_VP9_GET_PROB(num, den)      (((den) == 0) ? 128u : INTEL_VP9_CLAMP(((num) * 256 + ((den) >> 1)) / (den), 1, 255))
+#define INTEL_VP9_RECENTER(v, m) (((v) > ((m) << 1)) ? (v) : ((v) % 2 ? (m) - (((v) + 1) >> 1) : (m) + ((v) >> 1)))
+#define INTEL_VP9_GET_PROB(num, den) (((den) == 0) ? 128u : INTEL_VP9_CLAMP(((num) * 256 + ((den) >> 1)) / (den), 1, 255))
 #define INTEL_VP9_GET_BINARY_PROB(n0, n1) INTEL_VP9_GET_PROB(n0, n0 + n1)
 
 #define INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(pProbs, Count) \
 	Intel_HostvldVp9_MergeProb(pProbs, Count, VP9_COUNT_SAT, VP9_MAX_UPDATE_FACTOR)
 
-
-static const INT g_Vp9InterModeLookup[INTER_MODE_COUNT] = 
-{
-	PRED_MD_ZEROMV - PRED_MD_NEARESTMV, 
-	PRED_MD_NEARESTMV - PRED_MD_NEARESTMV, 
-	PRED_MD_NEARMV - PRED_MD_NEARESTMV, 
-	PRED_MD_NEWMV - PRED_MD_NEARESTMV
-};
+static const INT g_Vp9InterModeLookup[INTER_MODE_COUNT] =
+	{
+		PRED_MD_ZEROMV - PRED_MD_NEARESTMV,
+		PRED_MD_NEARESTMV - PRED_MD_NEARESTMV,
+		PRED_MD_NEARMV - PRED_MD_NEARESTMV,
+		PRED_MD_NEWMV - PRED_MD_NEARESTMV};
 
 /********************************************************************/
 /*********************** INTERNAL FUNCTIONS *************************/
@@ -121,26 +119,27 @@ static INT Intel_HostvldVp9_GetUnsignedBits(UINT uiNumValues)
 	return cat;
 }
 
-static PROBABILITY Intel_HostvldVp9_InverseMap(INT v, INT m) {
+static PROBABILITY Intel_HostvldVp9_InverseMap(INT v, INT m)
+{
 	// The clamp is not necessary for conforming VP9 stream, it is added to
 	// prevent out of bound access for bad input data
 	v = INTEL_VP9_CLAMP(v, 0, 253);
 	v = g_Vp9InverseMapTable[v];
 	m--;
 
-	if ((m << 1) <= VP9_MAX_PROB) 
+	if ((m << 1) <= VP9_MAX_PROB)
 	{
 		return 1 + INTEL_VP9_RECENTER(v, m);
-	} 
-	else 
+	}
+	else
 	{
 		return VP9_MAX_PROB - INTEL_VP9_RECENTER(v, VP9_MAX_PROB - 1 - m);
 	}
 }
 
 static INT Intel_HostvldVp9_DecodeUniform(
-	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine, 
-	INT                              n) 
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
+	INT n)
 {
 	INT v;
 	const INT l = Intel_HostvldVp9_GetUnsignedBits(n);
@@ -153,30 +152,32 @@ static INT Intel_HostvldVp9_DecodeUniform(
 
 	v = INTEL_HOSTVLD_VP9_READ_BITS(l - 1);
 
-	return v < m ?  v : (v << 1) - m + INTEL_HOSTVLD_VP9_READ_ONE_BIT;
+	return v < m ? v : (v << 1) - m + INTEL_HOSTVLD_VP9_READ_ONE_BIT;
 }
 
 static INT Intel_HostvldVp9_DecodeSubExponential(
-	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine) 
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine)
 {
 	INT i = 0, mk = 0, iSubExp, iBits, a;
 
-	while (1) 
+	while (1)
 	{
 		iBits = i ? VP9_SUBEXP_PARAM + i - 1 : VP9_SUBEXP_PARAM;
 		a = 1 << iBits;
 
-		if (255 <= mk + (3 << iBits)) 
+		if (255 <= mk + (3 << iBits))
 		{
 			iSubExp = Intel_HostvldVp9_DecodeUniform(pBacEngine, 255 - mk) + mk;
 			break;
-		} else {
+		}
+		else
+		{
 			if (INTEL_HOSTVLD_VP9_READ_ONE_BIT)
 			{
 				i++;
 				mk += a;
-			} 
-			else 
+			}
+			else
 			{
 				iSubExp = INTEL_HOSTVLD_VP9_READ_BITS(iBits) + mk;
 				break;
@@ -188,8 +189,8 @@ static INT Intel_HostvldVp9_DecodeSubExponential(
 }
 
 VOID Intel_HostvldVp9_UpdateProb(
-	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine, 
-	PPROBABILITY                     pProb) 
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
+	PPROBABILITY pProb)
 {
 	BOOL bUpdate = INTEL_HOSTVLD_VP9_READ_BIT(VP9_DIFF_UPDATE_PROB);
 
@@ -201,9 +202,9 @@ VOID Intel_HostvldVp9_UpdateProb(
 }
 
 VOID Intel_HostvldVp9_UpdateMvProb(
-	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine, 
-	PPROBABILITY                     pProb, 
-	DWORD                            n) 
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine,
+	PPROBABILITY pProb,
+	DWORD n)
 {
 	DWORD i;
 
@@ -217,207 +218,208 @@ VOID Intel_HostvldVp9_UpdateMvProb(
 }
 
 static VOID Intel_HostvldVp9_GetBranchCount(
-	UINT BranchCount[VP9_UNCONSTRAINED_NODES][2], 
-	UINT CoeffCounts[VP9_UNCONSTRAINED_NODES+1])
+	UINT BranchCount[VP9_UNCONSTRAINED_NODES][2],
+	UINT CoeffCounts[VP9_UNCONSTRAINED_NODES + 1])
 {
-	BranchCount[2][VP9_NODE_LEFT]   = CoeffCounts[VP9_ONE_TOKEN];
-	BranchCount[2][VP9_NODE_RIGHT]  = CoeffCounts[VP9_TWO_TOKEN];
-	BranchCount[1][VP9_NODE_LEFT]   = CoeffCounts[VP9_ZERO_TOKEN];
-	BranchCount[1][VP9_NODE_RIGHT]  = BranchCount[2][VP9_NODE_LEFT] + BranchCount[2][VP9_NODE_RIGHT];
-	BranchCount[0][VP9_NODE_LEFT]   = CoeffCounts[VP9_DCT_EOB_MODEL_TOKEN];
-	BranchCount[0][VP9_NODE_RIGHT]  = BranchCount[1][VP9_NODE_LEFT] + BranchCount[1][VP9_NODE_RIGHT];
+	BranchCount[2][VP9_NODE_LEFT] = CoeffCounts[VP9_ONE_TOKEN];
+	BranchCount[2][VP9_NODE_RIGHT] = CoeffCounts[VP9_TWO_TOKEN];
+	BranchCount[1][VP9_NODE_LEFT] = CoeffCounts[VP9_ZERO_TOKEN];
+	BranchCount[1][VP9_NODE_RIGHT] = BranchCount[2][VP9_NODE_LEFT] + BranchCount[2][VP9_NODE_RIGHT];
+	BranchCount[0][VP9_NODE_LEFT] = CoeffCounts[VP9_DCT_EOB_MODEL_TOKEN];
+	BranchCount[0][VP9_NODE_RIGHT] = BranchCount[1][VP9_NODE_LEFT] + BranchCount[1][VP9_NODE_RIGHT];
 }
 
 static PROBABILITY Intel_HostvldVp9_MergeProb(
-	PROBABILITY PrevProb, 
-	UINT        Count[2], 
-	UINT        uiCountSat, 
-	UINT        uiUpdateFactor)
+	PROBABILITY PrevProb,
+	UINT Count[2],
+	UINT uiCountSat,
+	UINT uiUpdateFactor)
 {
-	PROBABILITY Prob     = INTEL_VP9_GET_BINARY_PROB(Count[VP9_NODE_LEFT], Count[VP9_NODE_RIGHT]);
-	UINT        uiCount  = MIN(Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT], uiCountSat);
-	UINT        uiFactor = uiUpdateFactor * uiCount / uiCountSat;
-	return INTEL_VP9_ROUND_POWER_OF_TWO(PrevProb * (256 - uiFactor) + Prob * uiFactor, 8);;
+	PROBABILITY Prob = INTEL_VP9_GET_BINARY_PROB(Count[VP9_NODE_LEFT], Count[VP9_NODE_RIGHT]);
+	UINT uiCount = MIN(Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT], uiCountSat);
+	UINT uiFactor = uiUpdateFactor * uiCount / uiCountSat;
+	return INTEL_VP9_ROUND_POWER_OF_TWO(PrevProb * (256 - uiFactor) + Prob * uiFactor, 8);
+	;
 }
 
 static VOID Intel_HostvldVp9_AdaptProbsIntraMode(
-	INTEL_HOSTVLD_VP9_TKN_TREE CurrTree, 
-	INTEL_HOSTVLD_VP9_TKN_TREE PrevTree, 
-	UINT  CurrCounts[INTRA_MODE_COUNT])
+	INTEL_HOSTVLD_VP9_TKN_TREE CurrTree,
+	INTEL_HOSTVLD_VP9_TKN_TREE PrevTree,
+	UINT CurrCounts[INTRA_MODE_COUNT])
 {
-	UINT    Count[2], RightNodeCount;
+	UINT Count[2], RightNodeCount;
 
 	Count[VP9_NODE_RIGHT] = CurrCounts[PRED_MD_D207];
-	Count[VP9_NODE_LEFT]  = CurrCounts[PRED_MD_D153];
+	Count[VP9_NODE_LEFT] = CurrCounts[PRED_MD_D153];
 	CurrTree[16].ui8Prob = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevTree[16].ui8Prob, Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[PRED_MD_D63];
+	Count[VP9_NODE_LEFT] = CurrCounts[PRED_MD_D63];
 	CurrTree[14].ui8Prob = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevTree[14].ui8Prob, Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[PRED_MD_D45];
+	Count[VP9_NODE_LEFT] = CurrCounts[PRED_MD_D45];
 	CurrTree[8].ui8Prob = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevTree[8].ui8Prob, Count);
 	RightNodeCount = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
 
 	Count[VP9_NODE_RIGHT] = CurrCounts[PRED_MD_D117];
-	Count[VP9_NODE_LEFT]  = CurrCounts[PRED_MD_D135];
+	Count[VP9_NODE_LEFT] = CurrCounts[PRED_MD_D135];
 	CurrTree[10].ui8Prob = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevTree[10].ui8Prob, Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[PRED_MD_H];
+	Count[VP9_NODE_LEFT] = CurrCounts[PRED_MD_H];
 	CurrTree[7].ui8Prob = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevTree[7].ui8Prob, Count);
 
-	Count[VP9_NODE_LEFT]  = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
+	Count[VP9_NODE_LEFT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
 	Count[VP9_NODE_RIGHT] = RightNodeCount;
 	CurrTree[6].ui8Prob = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevTree[6].ui8Prob, Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[PRED_MD_V];
+	Count[VP9_NODE_LEFT] = CurrCounts[PRED_MD_V];
 	CurrTree[4].ui8Prob = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevTree[4].ui8Prob, Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[PRED_MD_TM];
+	Count[VP9_NODE_LEFT] = CurrCounts[PRED_MD_TM];
 	CurrTree[2].ui8Prob = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevTree[2].ui8Prob, Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[PRED_MD_DC];
+	Count[VP9_NODE_LEFT] = CurrCounts[PRED_MD_DC];
 	CurrTree[0].ui8Prob = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevTree[0].ui8Prob, Count);
 }
 
 static VOID Intel_HostvldVp9_AdaptProbsMvClass(
-	UINT8     CurrProbs[VP9_MV_CLASSES - 1], 
-	UINT8     PrevProbs[VP9_MV_CLASSES - 1], 
-	UINT      CurrCounts[VP9_MV_CLASSES])
+	UINT8 CurrProbs[VP9_MV_CLASSES - 1],
+	UINT8 PrevProbs[VP9_MV_CLASSES - 1],
+	UINT CurrCounts[VP9_MV_CLASSES])
 {
-	UINT    Count[2], RightNodeCount;
+	UINT Count[2], RightNodeCount;
 
 	Count[VP9_NODE_RIGHT] = CurrCounts[VP9_MV_CLASS_10];
-	Count[VP9_NODE_LEFT]  = CurrCounts[VP9_MV_CLASS_9];
+	Count[VP9_NODE_LEFT] = CurrCounts[VP9_MV_CLASS_9];
 	CurrProbs[9] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[9], Count);
 	RightNodeCount = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
 
 	Count[VP9_NODE_RIGHT] = CurrCounts[VP9_MV_CLASS_8];
-	Count[VP9_NODE_LEFT]  = CurrCounts[VP9_MV_CLASS_7];
+	Count[VP9_NODE_LEFT] = CurrCounts[VP9_MV_CLASS_7];
 	CurrProbs[8] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[8], Count);
 
-	Count[VP9_NODE_LEFT]  = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
+	Count[VP9_NODE_LEFT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
 	Count[VP9_NODE_RIGHT] = RightNodeCount;
 	CurrProbs[7] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[7], Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[VP9_MV_CLASS_6];
+	Count[VP9_NODE_LEFT] = CurrCounts[VP9_MV_CLASS_6];
 	CurrProbs[6] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[6], Count);
 	RightNodeCount = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
 
 	Count[VP9_NODE_RIGHT] = CurrCounts[VP9_MV_CLASS_5];
-	Count[VP9_NODE_LEFT]  = CurrCounts[VP9_MV_CLASS_4];
+	Count[VP9_NODE_LEFT] = CurrCounts[VP9_MV_CLASS_4];
 	CurrProbs[5] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[5], Count);
 
-	Count[VP9_NODE_LEFT]  = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
+	Count[VP9_NODE_LEFT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
 	Count[VP9_NODE_RIGHT] = RightNodeCount;
 	CurrProbs[4] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[4], Count);
 	RightNodeCount = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
 
 	Count[VP9_NODE_RIGHT] = CurrCounts[VP9_MV_CLASS_3];
-	Count[VP9_NODE_LEFT]  = CurrCounts[VP9_MV_CLASS_2];
+	Count[VP9_NODE_LEFT] = CurrCounts[VP9_MV_CLASS_2];
 	CurrProbs[3] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[3], Count);
 
-	Count[VP9_NODE_LEFT]  = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
+	Count[VP9_NODE_LEFT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
 	Count[VP9_NODE_RIGHT] = RightNodeCount;
 	CurrProbs[2] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[2], Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[VP9_MV_CLASS_1];
+	Count[VP9_NODE_LEFT] = CurrCounts[VP9_MV_CLASS_1];
 	CurrProbs[1] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[1], Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[VP9_MV_CLASS_0];
+	Count[VP9_NODE_LEFT] = CurrCounts[VP9_MV_CLASS_0];
 	CurrProbs[0] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[0], Count);
 }
 
 static VOID Intel_HostvldVp9_AdaptProbs3NodeTreeWithIndex(
-	UINT8     CurrProbs[3], 
-	UINT8     PrevProbs[3], 
-	UINT      CurrCounts[4], 
+	UINT8 CurrProbs[3],
+	UINT8 PrevProbs[3],
+	UINT CurrCounts[4],
 	const INT Index[4])
 {
-	UINT    Count[2];
+	UINT Count[2];
 
 	Count[VP9_NODE_RIGHT] = CurrCounts[Index[3]];
-	Count[VP9_NODE_LEFT]  = CurrCounts[Index[2]];
+	Count[VP9_NODE_LEFT] = CurrCounts[Index[2]];
 	CurrProbs[2] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[2], Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[Index[1]];
+	Count[VP9_NODE_LEFT] = CurrCounts[Index[1]];
 	CurrProbs[1] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[1], Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[Index[0]];
+	Count[VP9_NODE_LEFT] = CurrCounts[Index[0]];
 	CurrProbs[0] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[0], Count);
 }
 
 static VOID Intel_HostvldVp9_AdaptProbs3NodeTree(
-	UINT8 CurrProbs[3], 
-	UINT8 PrevProbs[3], 
-	UINT  CurrCounts[4])
+	UINT8 CurrProbs[3],
+	UINT8 PrevProbs[3],
+	UINT CurrCounts[4])
 {
-	UINT    Count[2];
+	UINT Count[2];
 
 	Count[VP9_NODE_RIGHT] = CurrCounts[3];
-	Count[VP9_NODE_LEFT]  = CurrCounts[2];
+	Count[VP9_NODE_LEFT] = CurrCounts[2];
 	CurrProbs[2] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[2], Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[1];
+	Count[VP9_NODE_LEFT] = CurrCounts[1];
 	CurrProbs[1] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[1], Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[0];
+	Count[VP9_NODE_LEFT] = CurrCounts[0];
 	CurrProbs[0] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[0], Count);
 }
 
 static VOID Intel_HostvldVp9_AdaptProbs2NodeTree(
-	UINT8 CurrProbs[2], 
-	UINT8 PrevProbs[2], 
-	UINT  CurrCounts[3])
+	UINT8 CurrProbs[2],
+	UINT8 PrevProbs[2],
+	UINT CurrCounts[3])
 {
-	UINT    Count[2];
+	UINT Count[2];
 
 	Count[VP9_NODE_RIGHT] = CurrCounts[2];
-	Count[VP9_NODE_LEFT]  = CurrCounts[1];
+	Count[VP9_NODE_LEFT] = CurrCounts[1];
 	CurrProbs[1] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[1], Count);
 
 	Count[VP9_NODE_RIGHT] = Count[VP9_NODE_LEFT] + Count[VP9_NODE_RIGHT];
-	Count[VP9_NODE_LEFT]  = CurrCounts[0];
+	Count[VP9_NODE_LEFT] = CurrCounts[0];
 	CurrProbs[0] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(PrevProbs[0], Count);
 }
 
 static VAStatus Intel_HostvldVp9_AdaptCoeffProbs(
-	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pCurrContext, 
-	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pPrevContext, 
-	PINTEL_HOSTVLD_VP9_COUNT         pCount,
-	PINTEL_HOSTVLD_VP9_FRAME_INFO    pFrameInfo)
+	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pCurrContext,
+	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pPrevContext,
+	PINTEL_HOSTVLD_VP9_COUNT pCount,
+	PINTEL_HOSTVLD_VP9_FRAME_INFO pFrameInfo)
 {
-	UINT        uiCountSat, uiUpdateFactor;
-	INT         i, j, k, l, m, n;
-	UINT        BranchCount[VP9_UNCONSTRAINED_NODES][2];
-	VAStatus  eStatus     = VA_STATUS_SUCCESS;
+	UINT uiCountSat, uiUpdateFactor;
+	INT i, j, k, l, m, n;
+	UINT BranchCount[VP9_UNCONSTRAINED_NODES][2];
+	VAStatus eStatus = VA_STATUS_SUCCESS;
 
 	if (pFrameInfo->bIsIntraOnly)
 	{
-		uiCountSat      = VP9_COEFF_COUNT_SAT_KEY;
-		uiUpdateFactor  = VP9_COEFF_MAX_UPDATE_FACTOR_KEY;
-	} 
-	else if (pFrameInfo->LastFrameType == KEY_FRAME) 
+		uiCountSat = VP9_COEFF_COUNT_SAT_KEY;
+		uiUpdateFactor = VP9_COEFF_MAX_UPDATE_FACTOR_KEY;
+	}
+	else if (pFrameInfo->LastFrameType == KEY_FRAME)
 	{
-		uiCountSat      = VP9_COEFF_COUNT_SAT_AFTER_KEY;
-		uiUpdateFactor  = VP9_COEFF_MAX_UPDATE_FACTOR_AFTER_KEY;
-	} 
-	else 
+		uiCountSat = VP9_COEFF_COUNT_SAT_AFTER_KEY;
+		uiUpdateFactor = VP9_COEFF_MAX_UPDATE_FACTOR_AFTER_KEY;
+	}
+	else
 	{
-		uiCountSat      = VP9_COEFF_COUNT_SAT;
-		uiUpdateFactor  = VP9_COEFF_MAX_UPDATE_FACTOR;
+		uiCountSat = VP9_COEFF_COUNT_SAT;
+		uiUpdateFactor = VP9_COEFF_MAX_UPDATE_FACTOR;
 	}
 
 	// Coefficient probabilities
@@ -444,7 +446,7 @@ static VAStatus Intel_HostvldVp9_AdaptCoeffProbs(
 							pCurrContext->CoeffProbs[n][i][j][k][l][m] = Intel_HostvldVp9_MergeProb(
 								pPrevContext->CoeffProbs[n][i][j][k][l][m],
 								BranchCount[m],
-								uiCountSat, 
+								uiCountSat,
 								uiUpdateFactor);
 						}
 					}
@@ -457,13 +459,13 @@ static VAStatus Intel_HostvldVp9_AdaptCoeffProbs(
 }
 
 static VAStatus Intel_HostvldVp9_AdaptModeProbs(
-	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pCurrContext, 
-	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pPrevContext, 
-	PINTEL_HOSTVLD_VP9_COUNT         pCount,
-	PINTEL_HOSTVLD_VP9_FRAME_INFO    pFrameInfo)
+	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pCurrContext,
+	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pPrevContext,
+	PINTEL_HOSTVLD_VP9_COUNT pCount,
+	PINTEL_HOSTVLD_VP9_FRAME_INFO pFrameInfo)
 {
-	INT         i, j;
-	VAStatus  eStatus     = VA_STATUS_SUCCESS;
+	INT i, j;
+	VAStatus eStatus = VA_STATUS_SUCCESS;
 
 	for (i = 0; i < VP9_INTRA_INTER_CONTEXTS; i++)
 	{
@@ -500,25 +502,25 @@ static VAStatus Intel_HostvldVp9_AdaptModeProbs(
 	for (i = 0; i < VP9_INTER_MODE_CONTEXTS; i++)
 	{
 		Intel_HostvldVp9_AdaptProbs3NodeTreeWithIndex(
-			pCurrContext->InterModeProbs[i], 
-			pPrevContext->InterModeProbs[i], 
-			pCount->InterModeCounts[i], 
+			pCurrContext->InterModeProbs[i],
+			pPrevContext->InterModeProbs[i],
+			pCount->InterModeCounts[i],
 			g_Vp9InterModeLookup);
 	}
 
 	for (i = 0; i < VP9_BLK_SIZE_GROUPS; i++)
 	{
 		Intel_HostvldVp9_AdaptProbsIntraMode(
-			pCurrContext->ModeTree_Y[i], 
-			pPrevContext->ModeTree_Y[i], 
+			pCurrContext->ModeTree_Y[i],
+			pPrevContext->ModeTree_Y[i],
 			pCount->IntraModeCounts_Y[i]);
 	}
 
 	for (i = 0; i < INTRA_MODE_COUNT; i++)
 	{
 		Intel_HostvldVp9_AdaptProbsIntraMode(
-			pCurrContext->ModeTree_UV[i], 
-			pPrevContext->ModeTree_UV[i], 
+			pCurrContext->ModeTree_UV[i],
+			pPrevContext->ModeTree_UV[i],
 			pCount->IntraModeCounts_UV[i]);
 	}
 
@@ -526,29 +528,29 @@ static VAStatus Intel_HostvldVp9_AdaptModeProbs(
 	for (i = 0; i < VP9_PARTITION_CONTEXTS; i++)
 	{
 		Intel_HostvldVp9_AdaptProbs3NodeTree(
-			pCurrContext->PartitionProbs[i].Prob, 
-			pPrevContext->PartitionProbs[i].Prob, 
+			pCurrContext->PartitionProbs[i].Prob,
+			pPrevContext->PartitionProbs[i].Prob,
 			pCount->PartitionCounts[i]);
 	}
 
 	// adapt switchable interpolation contexts
-	if (pFrameInfo->bIsSwitchableInterpolation) 
+	if (pFrameInfo->bIsSwitchableInterpolation)
 	{
 		for (i = 0; i < VP9_SWITCHABLE_FILTER_CONTEXTS; i++)
 		{
 			Intel_HostvldVp9_AdaptProbs2NodeTree(
-				pCurrContext->SwitchableInterpProbs[i], 
-				pPrevContext->SwitchableInterpProbs[i], 
+				pCurrContext->SwitchableInterpProbs[i],
+				pPrevContext->SwitchableInterpProbs[i],
 				pCount->SwitchableInterpCounts[i]);
 		}
 	}
 
-	if (pFrameInfo->TxMode == TX_MODE_SELECT) 
+	if (pFrameInfo->TxMode == TX_MODE_SELECT)
 	{
-		PUINT   puiTxCounts;
-		UINT    uiBranchCounts[3][2];
+		PUINT puiTxCounts;
+		UINT uiBranchCounts[3][2];
 
-		for (i = 0; i < VP9_TX_SIZE_CONTEXTS; i++) 
+		for (i = 0; i < VP9_TX_SIZE_CONTEXTS; i++)
 		{
 			// 8x8 or less transform
 			puiTxCounts = pCount->TxCountSet.Tx_8X8[i];
@@ -599,24 +601,23 @@ static VAStatus Intel_HostvldVp9_AdaptModeProbs(
 }
 
 static VAStatus Intel_HostvldVp9_AdaptMvProbs(
-	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pCurrContext, 
-	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pPrevContext, 
-	PINTEL_HOSTVLD_VP9_COUNT         pCount,
-	PINTEL_HOSTVLD_VP9_FRAME_INFO    pFrameInfo)
+	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pCurrContext,
+	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pPrevContext,
+	PINTEL_HOSTVLD_VP9_COUNT pCount,
+	PINTEL_HOSTVLD_VP9_FRAME_INFO pFrameInfo)
 {
-	INT         i, j;
-	VAStatus  eStatus     = VA_STATUS_SUCCESS;
-
+	INT i, j;
+	VAStatus eStatus = VA_STATUS_SUCCESS;
 
 	Intel_HostvldVp9_AdaptProbs3NodeTree(
-		pCurrContext->MvJointProbs, 
-		pPrevContext->MvJointProbs, 
+		pCurrContext->MvJointProbs,
+		pPrevContext->MvJointProbs,
 		pCount->MvJointCounts);
 
-	for (i = 0; i < VP9_MV_COMPONENTS; i++) 
+	for (i = 0; i < VP9_MV_COMPONENTS; i++)
 	{
-		PINTEL_HOSTVLD_VP9_MV_PROB_SET  pCurrMvProbs = pCurrContext->MvProbSet + i;
-		PINTEL_HOSTVLD_VP9_MV_PROB_SET  pPrevMvProbs = pPrevContext->MvProbSet + i;
+		PINTEL_HOSTVLD_VP9_MV_PROB_SET pCurrMvProbs = pCurrContext->MvProbSet + i;
+		PINTEL_HOSTVLD_VP9_MV_PROB_SET pPrevMvProbs = pPrevContext->MvProbSet + i;
 		PINTEL_HOSTVLD_VP9_MV_COUNT_SET pMvCounts = pCount->MvCountSet + i;
 
 		pCurrMvProbs->MvSignProbs = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(
@@ -624,12 +625,12 @@ static VAStatus Intel_HostvldVp9_AdaptMvProbs(
 			pMvCounts->MvSignCounts);
 
 		Intel_HostvldVp9_AdaptProbsMvClass(
-			pCurrMvProbs->MvClassProbs, 
-			pPrevMvProbs->MvClassProbs, 
+			pCurrMvProbs->MvClassProbs,
+			pPrevMvProbs->MvClassProbs,
 			pMvCounts->MvClassCounts);
 
 		pCurrMvProbs->MvClass0Probs[0] = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(
-			pPrevMvProbs->MvClass0Probs[0], 
+			pPrevMvProbs->MvClass0Probs[0],
 			pMvCounts->MvClass0Counts);
 
 		for (j = 0; j < VP9_MV_OFFSET_BITS; j++)
@@ -642,24 +643,24 @@ static VAStatus Intel_HostvldVp9_AdaptMvProbs(
 		for (j = 0; j < VP9_MV_CLASS0_SIZE; j++)
 		{
 			Intel_HostvldVp9_AdaptProbs3NodeTree(
-				pCurrMvProbs->MvClass0FpProbs[j], 
-				pPrevMvProbs->MvClass0FpProbs[j], 
+				pCurrMvProbs->MvClass0FpProbs[j],
+				pPrevMvProbs->MvClass0FpProbs[j],
 				pMvCounts->MvClass0FpCounts[j]);
 		}
 
 		Intel_HostvldVp9_AdaptProbs3NodeTree(
-			pCurrMvProbs->MvFpProbs, 
-			pPrevMvProbs->MvFpProbs, 
+			pCurrMvProbs->MvFpProbs,
+			pPrevMvProbs->MvFpProbs,
 			pMvCounts->MvFpCounts);
 
-		if (pFrameInfo->bAllowHighPrecisionMv) 
+		if (pFrameInfo->bAllowHighPrecisionMv)
 		{
 			pCurrMvProbs->MvClass0HpProbs = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(
-				pPrevMvProbs->MvClass0HpProbs, 
+				pPrevMvProbs->MvClass0HpProbs,
 				pMvCounts->MvClass0HpCounts);
 
 			pCurrMvProbs->MvHpProbs = INTEL_HOSTVLD_VP9_MERGE_PROB_MAX(
-				pPrevMvProbs->MvHpProbs, 
+				pPrevMvProbs->MvHpProbs,
 				pMvCounts->MvHpCounts);
 		}
 	}
@@ -670,88 +671,87 @@ static VAStatus Intel_HostvldVp9_AdaptMvProbs(
 VAStatus Intel_HostvldVp9_InitializeProbabilities(
 	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pContext)
 {
-	size_t      Size;
-	VAStatus  eStatus = VA_STATUS_SUCCESS;
-
+	size_t Size;
+	VAStatus eStatus = VA_STATUS_SUCCESS;
 
 	Size = sizeof(pContext->TxProbTableSet);
 	memcpy(
-		&pContext->TxProbTableSet, 
+		&pContext->TxProbTableSet,
 		&g_Vp9DefaultTxProbs,
 		Size);
 	Size = VP9_MBSKIP_CONTEXTS * sizeof(pContext->MbSkipProbs[0]);
 	memcpy(
-		pContext->MbSkipProbs, 
+		pContext->MbSkipProbs,
 		g_Vp9DefaultMbSkipProbs,
 		Size);
 	Size = VP9_PARTITION_CONTEXTS * sizeof(pContext->PartitionProbs[0]);
 	memcpy(
-		pContext->PartitionProbs, 
+		pContext->PartitionProbs,
 		g_Vp9DefaultPartitionProbs,
 		Size);
 
 	// inter probs
 	Size = VP9_BLK_SIZE_GROUPS * sizeof(pContext->ModeTree_Y[0]);
 	memcpy(
-		pContext->ModeTree_Y, 
+		pContext->ModeTree_Y,
 		g_Vp9DefaultIntraInInterProbTreeY,
 		Size);
 	Size = INTRA_MODE_COUNT * sizeof(pContext->ModeTree_UV[0]);
 	memcpy(
-		pContext->ModeTree_UV, 
+		pContext->ModeTree_UV,
 		g_Vp9DefaultIntraInInterProbTreeUV,
 		Size);
-	Size = VP9_INTER_MODE_CONTEXTS * (INTER_MODE_COUNT - 1) * 
-		sizeof(pContext->InterModeProbs[0][0]);
+	Size = VP9_INTER_MODE_CONTEXTS * (INTER_MODE_COUNT - 1) *
+		   sizeof(pContext->InterModeProbs[0][0]);
 	memcpy(
-		pContext->InterModeProbs, 
+		pContext->InterModeProbs,
 		g_Vp9DefaultInterModeProbs,
 		Size);
-	Size = VP9_SWITCHABLE_FILTER_CONTEXTS * (VP9_SWITCHABLE_FILTERS - 1) * 
-		sizeof(pContext->SwitchableInterpProbs[0][0]);
+	Size = VP9_SWITCHABLE_FILTER_CONTEXTS * (VP9_SWITCHABLE_FILTERS - 1) *
+		   sizeof(pContext->SwitchableInterpProbs[0][0]);
 	memcpy(
-		pContext->SwitchableInterpProbs, 
+		pContext->SwitchableInterpProbs,
 		g_Vp9DefaultSwitchableInterpProbs,
 		Size);
 	Size = VP9_INTRA_INTER_CONTEXTS * sizeof(pContext->IntraInterProbs[0]);
 	memcpy(
-		&pContext->IntraInterProbs[0], 
+		&pContext->IntraInterProbs[0],
 		g_Vp9DefaultIntraInterProbs,
 		Size);
 	Size = VP9_COMPOUND_INTER_CONTEXTS * sizeof(pContext->CompoundInterProbs[0]);
 	memcpy(
-		&pContext->CompoundInterProbs[0], 
+		&pContext->CompoundInterProbs[0],
 		g_Vp9DefaultCompoundInterProbs,
 		Size);
 	Size = VP9_REF_CONTEXTS * 2 * sizeof(pContext->SingleRefProbs[0][0]);
 	memcpy(
-		pContext->SingleRefProbs, 
+		pContext->SingleRefProbs,
 		g_Vp9DefaultSingleRefProbs,
 		Size);
 	Size = VP9_REF_CONTEXTS * sizeof(pContext->CompoundRefProbs[0]);
 	memcpy(
-		&pContext->CompoundRefProbs[0], 
+		&pContext->CompoundRefProbs[0],
 		g_Vp9DefaultCompoundRefProbs,
 		Size);
 
 	// mv probs
 	Size = (VP9_MV_JOINTS - 1) * sizeof(pContext->MvJointProbs[0]);
 	memcpy(
-		&pContext->MvJointProbs[0], 
+		&pContext->MvJointProbs[0],
 		g_Vp9DefaultMvJointProbs,
 		Size);
 	Size = VP9_MV_COMPONENTS * sizeof(pContext->MvProbSet[0]);
 	memcpy(
-		&pContext->MvProbSet[0], 
+		&pContext->MvProbSet[0],
 		g_Vp9DefaultMvProbSet,
 		Size);
 
 	// coefficient probs
-	Size = TX_SIZES * INTEL_HOSTVLD_VP9_YUV_PLANE_NUMBER * 
-		REF_TYPES * VP9_COEF_BANDS * VP9_PREV_COEF_CONTEXTS * VP9_UNCONSTRAINED_NODES * 
-		sizeof(pContext->CoeffProbs[0][0][0][0][0][0]);
+	Size = TX_SIZES * INTEL_HOSTVLD_VP9_YUV_PLANE_NUMBER *
+		   REF_TYPES * VP9_COEF_BANDS * VP9_PREV_COEF_CONTEXTS * VP9_UNCONSTRAINED_NODES *
+		   sizeof(pContext->CoeffProbs[0][0][0][0][0][0]);
 	memcpy(
-		pContext->CoeffProbs, 
+		pContext->CoeffProbs,
 		g_Vp9DefaultCoeffProbs,
 		Size);
 
@@ -763,47 +763,48 @@ VAStatus Intel_HostvldVp9_InitializeProbabilities(
 /******************************************************************/
 
 VAStatus Intel_HostvldVp9_GetCurrFrameContext(
-	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT  pCtxTable,
-	PINTEL_HOSTVLD_VP9_FRAME_INFO     pFrameInfo)
+	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pCtxTable,
+	PINTEL_HOSTVLD_VP9_FRAME_INFO pFrameInfo)
 {
 	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pContext;
-	VAStatus  eStatus     = VA_STATUS_SUCCESS;
+	VAStatus eStatus = VA_STATUS_SUCCESS;
 
 	if (pFrameInfo->uiFrameContextIndex >= 4)
 	{
 		eStatus = VA_STATUS_ERROR_INVALID_PARAMETER;
+		verbose("[Intel_HostvldVp9_GetCurrFrameContext] (ERROR) uiFrameContextIndex >= 4\r\n");
 		goto finish;
 	}
+
 	memcpy(
 		pFrameInfo->pContext,
 		pCtxTable + pFrameInfo->uiFrameContextIndex,
 		sizeof(*(pCtxTable + pFrameInfo->uiFrameContextIndex)));
 
-	//reset TxProbTables pointers.
-	pContext                                        = pFrameInfo->pContext;
-	pContext->TxProbTables[TX_8X8].pui8ProbTable    = &pContext->TxProbTableSet.Tx_8X8[0][0];
-	pContext->TxProbTables[TX_8X8].uiStride         = TX_8X8;
-	pContext->TxProbTables[TX_16X16].pui8ProbTable  = &pContext->TxProbTableSet.Tx_16X16[0][0];
-	pContext->TxProbTables[TX_16X16].uiStride       = TX_16X16;
-	pContext->TxProbTables[TX_32X32].pui8ProbTable  = &pContext->TxProbTableSet.Tx_32X32[0][0];
-	pContext->TxProbTables[TX_32X32].uiStride       = TX_32X32;
+	// reset TxProbTables pointers.
+	pContext = pFrameInfo->pContext;
+	pContext->TxProbTables[TX_8X8].pui8ProbTable = &pContext->TxProbTableSet.Tx_8X8[0][0];
+	pContext->TxProbTables[TX_8X8].uiStride = TX_8X8;
+	pContext->TxProbTables[TX_16X16].pui8ProbTable = &pContext->TxProbTableSet.Tx_16X16[0][0];
+	pContext->TxProbTables[TX_16X16].uiStride = TX_16X16;
+	pContext->TxProbTables[TX_32X32].pui8ProbTable = &pContext->TxProbTableSet.Tx_32X32[0][0];
+	pContext->TxProbTables[TX_32X32].uiStride = TX_32X32;
 
 finish:
 	return eStatus;
 }
 
 VAStatus Intel_HostvldVp9_ResetContext(
-	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT  pCtxTable,
-	PINTEL_HOSTVLD_VP9_FRAME_INFO    pFrameInfo)
+	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pCtxTable,
+	PINTEL_HOSTVLD_VP9_FRAME_INFO pFrameInfo)
 {
 	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pContext;
-	BOOL       bResetAll, bResetSpecified;
+	BOOL bResetAll, bResetSpecified;
 	VAStatus eStatus = VA_STATUS_SUCCESS;
 
-
 	bResetAll =
-		(pFrameInfo->bIsKeyFrame || 
-		 pFrameInfo->bErrorResilientMode || 
+		(pFrameInfo->bIsKeyFrame ||
+		 pFrameInfo->bErrorResilientMode ||
 		 (pFrameInfo->uiResetFrameContext == 3));
 
 	bResetSpecified = (pFrameInfo->uiResetFrameContext == 2);
@@ -812,18 +813,20 @@ VAStatus Intel_HostvldVp9_ResetContext(
 
 	if (bResetAll)
 	{
-			Intel_HostvldVp9_InitializeProbabilities(
+		Intel_HostvldVp9_InitializeProbabilities(
 			pFrameInfo->pContext);
-		//all 4 context tables updating will be done in postparser thread
+		// all 4 context tables updating will be done in postparser thread
 	}
 	else if (bResetSpecified)
 	{
 		if (pFrameInfo->uiFrameContextIndex >= 4)
 		{
 			eStatus = VA_STATUS_ERROR_INVALID_PARAMETER;
+			verbose("[Intel_HostvldVp9_ResetContext] (ERROR) uiFrameContextIndex >= 4\r\n");
 			goto finish;
 		}
-			Intel_HostvldVp9_InitializeProbabilities(
+
+		Intel_HostvldVp9_InitializeProbabilities(
 			pCtxTable + pFrameInfo->uiFrameContextIndex);
 
 		memcpy(
@@ -832,14 +835,14 @@ VAStatus Intel_HostvldVp9_ResetContext(
 			sizeof(*pCtxTable));
 	}
 
-	//reset TxProbTables pointers.
-	pContext                                        = pFrameInfo->pContext;
-	pContext->TxProbTables[TX_8X8].pui8ProbTable    = &pContext->TxProbTableSet.Tx_8X8[0][0];
-	pContext->TxProbTables[TX_8X8].uiStride         = TX_8X8;
-	pContext->TxProbTables[TX_16X16].pui8ProbTable  = &pContext->TxProbTableSet.Tx_16X16[0][0];
-	pContext->TxProbTables[TX_16X16].uiStride       = TX_16X16;
-	pContext->TxProbTables[TX_32X32].pui8ProbTable  = &pContext->TxProbTableSet.Tx_32X32[0][0];
-	pContext->TxProbTables[TX_32X32].uiStride       = TX_32X32;
+	// reset TxProbTables pointers.
+	pContext = pFrameInfo->pContext;
+	pContext->TxProbTables[TX_8X8].pui8ProbTable = &pContext->TxProbTableSet.Tx_8X8[0][0];
+	pContext->TxProbTables[TX_8X8].uiStride = TX_8X8;
+	pContext->TxProbTables[TX_16X16].pui8ProbTable = &pContext->TxProbTableSet.Tx_16X16[0][0];
+	pContext->TxProbTables[TX_16X16].uiStride = TX_16X16;
+	pContext->TxProbTables[TX_32X32].pui8ProbTable = &pContext->TxProbTableSet.Tx_32X32[0][0];
+	pContext->TxProbTables[TX_32X32].uiStride = TX_32X32;
 
 	pFrameInfo->uiFrameContextIndex = 0;
 
@@ -848,17 +851,17 @@ finish:
 }
 
 VAStatus Intel_HostvldVp9_UpdateContextTables(
-	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT  pCtxTable,
-	PINTEL_HOSTVLD_VP9_FRAME_INFO     pFrameInfo)
+	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pCtxTable,
+	PINTEL_HOSTVLD_VP9_FRAME_INFO pFrameInfo)
 {
 	VAStatus eStatus = VA_STATUS_SUCCESS;
 
 	if (pFrameInfo->bIsKeyFrame ||
-		 pFrameInfo->bErrorResilientMode ||
-		 (pFrameInfo->uiResetFrameContext == 3))
+		pFrameInfo->bErrorResilientMode ||
+		(pFrameInfo->uiResetFrameContext == 3))
 	{
 		INT i;
-			Intel_HostvldVp9_InitializeProbabilities(
+		Intel_HostvldVp9_InitializeProbabilities(
 			pCtxTable);
 
 		for (i = 1; i < 4; i++)
@@ -875,11 +878,11 @@ VAStatus Intel_HostvldVp9_UpdateContextTables(
 
 VAStatus Intel_HostvldVp9_SetupSegmentationProbs(
 	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pContext,
-	PUCHAR                              pSegTreeProb,
-	PUCHAR                              pSegPredProb)
+	PUCHAR pSegTreeProb,
+	PUCHAR pSegPredProb)
 {
-	size_t      Size;
-	VAStatus  eStatus = VA_STATUS_SUCCESS;
+	size_t Size;
+	VAStatus eStatus = VA_STATUS_SUCCESS;
 
 	INTEL_HOSTVLD_VP9_SEGMENT_TREE SegTree = INTEL_HOSTVLD_VP9_SEGMENT_PROB_TREE(
 		pSegTreeProb[0],
@@ -905,16 +908,16 @@ VAStatus Intel_HostvldVp9_SetupSegmentationProbs(
 }
 
 VAStatus Intel_HostvldVp9_ReadProbabilitiesInter(
-	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pContext, 
-	PINTEL_HOSTVLD_VP9_FRAME_INFO    pFrameInfo, 
-	PINTEL_HOSTVLD_VP9_BAC_ENGINE    pBacEngine)
+	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pContext,
+	PINTEL_HOSTVLD_VP9_FRAME_INFO pFrameInfo,
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine)
 {
-	INT                         i, j;
-	PBOOL                       pbRefFrameSignBias;
-	DWORD                       dwPredictionMode;
-	VAStatus                  eStatus     = VA_STATUS_SUCCESS;
+	INT i, j;
+	PBOOL pbRefFrameSignBias;
+	DWORD dwPredictionMode;
+	VAStatus eStatus = VA_STATUS_SUCCESS;
 
-	pbRefFrameSignBias  = pFrameInfo->RefFrameSignBias;
+	pbRefFrameSignBias = pFrameInfo->RefFrameSignBias;
 
 	// inter mode probs
 	for (i = 0; i < VP9_INTER_MODE_CONTEXTS; i++)
@@ -945,7 +948,7 @@ VAStatus Intel_HostvldVp9_ReadProbabilitiesInter(
 
 	// compound prediction probs
 	dwPredictionMode = VP9_SINGLE_PREDICTION_ONLY;
-	if ((pbRefFrameSignBias[VP9_REF_FRAME_GOLDEN] != pbRefFrameSignBias[VP9_REF_FRAME_LAST]) || 
+	if ((pbRefFrameSignBias[VP9_REF_FRAME_GOLDEN] != pbRefFrameSignBias[VP9_REF_FRAME_LAST]) ||
 		(pbRefFrameSignBias[VP9_REF_FRAME_ALTREF] != pbRefFrameSignBias[VP9_REF_FRAME_LAST]))
 	{
 		// compound allowed, read prediction mode
@@ -955,19 +958,19 @@ VAStatus Intel_HostvldVp9_ReadProbabilitiesInter(
 		}
 
 		// setup frame level compound prediction reference frame
-		if (pbRefFrameSignBias[VP9_REF_FRAME_LAST] == pbRefFrameSignBias[VP9_REF_FRAME_GOLDEN]) 
+		if (pbRefFrameSignBias[VP9_REF_FRAME_LAST] == pbRefFrameSignBias[VP9_REF_FRAME_GOLDEN])
 		{
-				pFrameInfo->CompondFixedRef = VP9_REF_FRAME_ALTREF;
-				pFrameInfo->CompondVarRef[0] = VP9_REF_FRAME_LAST;
-				pFrameInfo->CompondVarRef[1] = VP9_REF_FRAME_GOLDEN;
-		} 
-		else if (pbRefFrameSignBias[VP9_REF_FRAME_LAST] == pbRefFrameSignBias[VP9_REF_FRAME_ALTREF]) 
+			pFrameInfo->CompondFixedRef = VP9_REF_FRAME_ALTREF;
+			pFrameInfo->CompondVarRef[0] = VP9_REF_FRAME_LAST;
+			pFrameInfo->CompondVarRef[1] = VP9_REF_FRAME_GOLDEN;
+		}
+		else if (pbRefFrameSignBias[VP9_REF_FRAME_LAST] == pbRefFrameSignBias[VP9_REF_FRAME_ALTREF])
 		{
-				pFrameInfo->CompondFixedRef = VP9_REF_FRAME_GOLDEN;
-				pFrameInfo->CompondVarRef[0] = VP9_REF_FRAME_LAST;
-				pFrameInfo->CompondVarRef[1] = VP9_REF_FRAME_ALTREF;
-		} 
-		else 
+			pFrameInfo->CompondFixedRef = VP9_REF_FRAME_GOLDEN;
+			pFrameInfo->CompondVarRef[0] = VP9_REF_FRAME_LAST;
+			pFrameInfo->CompondVarRef[1] = VP9_REF_FRAME_ALTREF;
+		}
+		else
 		{
 			pFrameInfo->CompondFixedRef = VP9_REF_FRAME_LAST;
 			pFrameInfo->CompondVarRef[0] = VP9_REF_FRAME_GOLDEN;
@@ -1031,7 +1034,7 @@ VAStatus Intel_HostvldVp9_ReadProbabilitiesInter(
 	// MV probs
 	Intel_HostvldVp9_UpdateMvProb(pBacEngine, pContext->MvJointProbs, VP9_MV_JOINTS - 1);
 
-	for (i = 0; i < VP9_MV_COMPONENTS; i++) 
+	for (i = 0; i < VP9_MV_COMPONENTS; i++)
 	{
 		PINTEL_HOSTVLD_VP9_MV_PROB_SET pMvProbSet = pContext->MvProbSet + i;
 
@@ -1045,7 +1048,7 @@ VAStatus Intel_HostvldVp9_ReadProbabilitiesInter(
 		Intel_HostvldVp9_UpdateMvProb(pBacEngine, pMvProbSet->MvBitsProbs, VP9_MV_OFFSET_BITS);
 	}
 
-	for (i = 0; i < VP9_MV_COMPONENTS; i++) 
+	for (i = 0; i < VP9_MV_COMPONENTS; i++)
 	{
 		PINTEL_HOSTVLD_VP9_MV_PROB_SET pMvProbSet = pContext->MvProbSet + i;
 
@@ -1057,9 +1060,9 @@ VAStatus Intel_HostvldVp9_ReadProbabilitiesInter(
 		Intel_HostvldVp9_UpdateMvProb(pBacEngine, pMvProbSet->MvFpProbs, 3);
 	}
 
-	if (pFrameInfo->bAllowHighPrecisionMv) 
+	if (pFrameInfo->bAllowHighPrecisionMv)
 	{
-		for (i = 0; i < VP9_MV_COMPONENTS; i++) 
+		for (i = 0; i < VP9_MV_COMPONENTS; i++)
 		{
 			PINTEL_HOSTVLD_VP9_MV_PROB_SET pMvProbSet = pContext->MvProbSet + i;
 
@@ -1079,12 +1082,12 @@ VAStatus Intel_HostvldVp9_ReadProbabilitiesInter(
 }
 
 VAStatus Intel_HostvldVp9_ReadProbabilities(
-	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pContext, 
-	PINTEL_HOSTVLD_VP9_FRAME_INFO    pFrameInfo, 
-	PINTEL_HOSTVLD_VP9_BAC_ENGINE    pBacEngine)
+	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pContext,
+	PINTEL_HOSTVLD_VP9_FRAME_INFO pFrameInfo,
+	PINTEL_HOSTVLD_VP9_BAC_ENGINE pBacEngine)
 {
-	INT                         i, j, k, l, m, n;
-	VAStatus                  eStatus     = VA_STATUS_SUCCESS;
+	INT i, j, k, l, m, n;
+	VAStatus eStatus = VA_STATUS_SUCCESS;
 
 	// Read probabilities
 	if (pFrameInfo->TxMode == TX_MODE_SELECT)
@@ -1163,17 +1166,17 @@ VAStatus Intel_HostvldVp9_ReadProbabilities(
 }
 
 VAStatus Intel_HostvldVp9_AdaptProbabilities(
-	PINTEL_HOSTVLD_VP9_FRAME_STATE   pFrameState)
+	PINTEL_HOSTVLD_VP9_FRAME_STATE pFrameState)
 {
-	PINTEL_HOSTVLD_VP9_FRAME_INFO    pFrameInfo;
+	PINTEL_HOSTVLD_VP9_FRAME_INFO pFrameInfo;
 	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pCurrContext, pPrevContext;
-	PINTEL_HOSTVLD_VP9_COUNT         pCount;
-	VAStatus                  eStatus     = VA_STATUS_SUCCESS;
+	PINTEL_HOSTVLD_VP9_COUNT pCount;
+	VAStatus eStatus = VA_STATUS_SUCCESS;
 
-	pFrameInfo      = &pFrameState->FrameInfo;
-	pCurrContext    = pFrameInfo->pContext;
-	pPrevContext    = &(pFrameState->pVp9HostVld->ContextTable[pFrameInfo->uiFrameContextIndex]);
-	pCount          = &pFrameState->pTileStateBase->Count;
+	pFrameInfo = &pFrameState->FrameInfo;
+	pCurrContext = pFrameInfo->pContext;
+	pPrevContext = &(pFrameState->pVp9HostVld->ContextTable[pFrameInfo->uiFrameContextIndex]);
+	pCount = &pFrameState->pTileStateBase->Count;
 
 	if (!pFrameInfo->bErrorResilientMode && pFrameInfo->bFrameParallelDisabled)
 	{
@@ -1193,26 +1196,26 @@ VAStatus Intel_HostvldVp9_AdaptProbabilities(
 }
 
 VAStatus Intel_HostvldVp9_RefreshFrameContext(
-	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT  pCtxTable,
-	PINTEL_HOSTVLD_VP9_FRAME_INFO     pFrameInfo)
+	PINTEL_HOSTVLD_VP9_FRAME_CONTEXT pCtxTable,
+	PINTEL_HOSTVLD_VP9_FRAME_INFO pFrameInfo)
 {
-	VAStatus                  eStatus     = VA_STATUS_SUCCESS;
-
+	VAStatus eStatus = VA_STATUS_SUCCESS;
 
 	if (pFrameInfo->pPicParams->PicFlags.fields.refresh_frame_context)
 	{
 		if (pFrameInfo->uiFrameContextIndex >= 4)
 		{
 			eStatus = VA_STATUS_ERROR_INVALID_PARAMETER;
+			verbose("[Intel_HostvldVp9_RefreshFrameContext] (ERROR) uiFrameContextIndex >= 4\r\n");
 			goto finish;
 		}
+
 		memcpy(
 			pCtxTable + pFrameInfo->uiFrameContextIndex,
-			pFrameInfo->pContext, 
+			pFrameInfo->pContext,
 			sizeof(*pFrameInfo->pContext));
 	}
 
 finish:
 	return eStatus;
 }
-

@@ -347,7 +347,7 @@ extern "C" {
 
 extern uint32_t g_intel_debug_option_flags;
 
-static void verbose(const char *format, ...)
+static inline void verbose(const char *format, ...)
 {
 	if (!(g_intel_debug_option_flags & VA_INTEL_HYBRID_VERBOSE))
 	{

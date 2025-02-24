@@ -302,6 +302,7 @@ VAStatus Intel_HostvldVp9_LoopfilterLevelAndMaskInSingleBlock(
 	if ((pMode->DW1.ui8TxSizeLuma >= TX_SIZES) || (pMode->DW0.ui8TxSizeChroma >= TX_SIZES))
 	{
 		eStatus = VA_STATUS_ERROR_INVALID_PARAMETER;
+		verbose("[Intel_HostvldVp9_LoopfilterLevelAndMaskInSingleBlock] (ERROR) Invalid ui8TxSizeLuma OR ui8TxSizeChroma\r\n");
 		return eStatus;
 	}
 
@@ -752,6 +753,7 @@ VAStatus Intel_HostvldVp9_LoopfilterSuperBlock(
 	if ((BlockSize <= BLOCK_4X4) || (BlockSize >= BLOCK_INVALID))
 	{
 		eStatus = VA_STATUS_ERROR_INVALID_PARAMETER;
+		verbose("[Intel_HostvldVp9_LoopfilterSuperBlock] (ERROR) Invalid block size: %i\r\n", BlockSize);
 		goto finish;
 	}
 
@@ -924,7 +926,7 @@ VAStatus Intel_HostvldVp9_LoopfilterSuperBlock(
 	else
 	{
 		eStatus = VA_STATUS_ERROR_INVALID_PARAMETER;
-		printf("Invalid partition type.");
+		verbose("[Intel_HostvldVp9_LoopfilterSuperBlock] (ERROR) Invalid partition type.\r\n");
 	}
 
 update_block_size:
@@ -941,7 +943,6 @@ update_block_size:
 
 finish:
 	return eStatus;
-
 }
 
 VAStatus Intel_HostvldVp9_SetOutOfBoundValues(
