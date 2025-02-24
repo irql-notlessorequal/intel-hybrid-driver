@@ -104,7 +104,7 @@
 
 #define VP9_HYBRID_DECODE_REF_SCALE_SHIFT 14
 
-#define VP9_HYBRID_DECODE_COMBINED_FILETER_SIZE 512
+#define VP9_HYBRID_DECODE_COMBINED_FILTER_SIZE 512
 
 #define INTEL_DECODE_CHK_MDF_STATUS(_mdfstatus)         \
 	do                                                  \
@@ -292,6 +292,7 @@ INTEL_HYBRID_VP9_ALLOCATE_MDF_2DUP_BUFFER_UINT8(
 	return VA_STATUS_SUCCESS;
 
 allocation_fail:
+	verbose("[INTEL_HYBRID_VP9_ALLOCATE_MDF_2DUP_BUFFER_UINT8] Allocation failed.\r\n");
 	return VA_STATUS_ERROR_ALLOCATION_FAILED;
 }
 
@@ -313,7 +314,10 @@ static VAStatus INTEL_HYBRID_VP9_ALLOCATE_MDF_1D_BUFFER_UINT8(
 	if (cm_status == CM_SUCCESS)
 		return VA_STATUS_SUCCESS;
 	else
+	{
+		verbose("[INTEL_HYBRID_VP9_ALLOCATE_MDF_1D_BUFFER_UINT8] Allocation failed.\r\n");
 		return VA_STATUS_ERROR_ALLOCATION_FAILED;
+	}
 }
 
 static VAStatus
@@ -335,7 +339,10 @@ INTEL_HYBRID_VP9_ALLOCATE_MDF_1D_BUFFER_UINT16(
 	if (cm_status == CM_SUCCESS)
 		return VA_STATUS_SUCCESS;
 	else
+	{
+		verbose("[INTEL_HYBRID_VP9_ALLOCATE_MDF_1D_BUFFER_UINT16] Allocation failed.\r\n");
 		return VA_STATUS_ERROR_ALLOCATION_FAILED;
+	}
 }
 
 static VAStatus
@@ -357,7 +364,10 @@ INTEL_HYBRID_VP9_ALLOCATE_MDF_1D_BUFFER_UINT64(
 	if (cm_status == CM_SUCCESS)
 		return VA_STATUS_SUCCESS;
 	else
+	{
+		verbose("[INTEL_HYBRID_VP9_ALLOCATE_MDF_1D_BUFFER_UINT64] Allocation failed.\r\n");
 		return VA_STATUS_ERROR_ALLOCATION_FAILED;
+	}
 }
 
 static void INTEL_HYBRID_VP9_DESTROY_MDF_2D_BUFFER(
@@ -499,6 +509,7 @@ INTEL_HYBRID_VP9_ALLOCATE_MDF_2DUP_BUFFER_UINT8(
 	return VA_STATUS_SUCCESS;
 
 allocation_fail:
+	verbose("[INTEL_HYBRID_VP9_ALLOCATE_MDF_2DUP_BUFFER_UINT8] Allocation failed.\r\n");
 	return VA_STATUS_ERROR_ALLOCATION_FAILED;
 }
 
@@ -951,6 +962,7 @@ VAStatus Intel_HybridVp9Decode_MdfHost_SetKernelThreadCount(
 		break;
 	default:
 		eStatus = VA_STATUS_ERROR_UNKNOWN;
+		verbose("[Intel_HybridVp9Decode_MdfHost_SetKernelThreadCount] Unknown dwIntraPredKernelModeLuma: %i\r\n", dwIntraPredKernelModeLuma);
 		goto finish;
 	}
 
@@ -972,6 +984,7 @@ VAStatus Intel_HybridVp9Decode_MdfHost_SetKernelThreadCount(
 		break;
 	default:
 		eStatus = VA_STATUS_ERROR_UNKNOWN;
+		verbose("[Intel_HybridVp9Decode_MdfHost_SetKernelThreadCount] Unknown dwIntraPredKernelModeChroma: %i\r\n", dwIntraPredKernelModeChroma);
 		goto finish;
 	}
 
@@ -1904,7 +1917,7 @@ VAStatus Intel_HybridVp9Decode_MdfHost_Create(
 	}
 
 	// Allocate and initialize combined filter coefficient buffer
-	INTEL_HYBRID_VP9_ALLOCATE_MDF_1D_BUFFER_UINT16(ctx, pMdfDevice, &pMdfDecodeEngine->CombinedFilters, VP9_HYBRID_DECODE_COMBINED_FILETER_SIZE);
+	INTEL_HYBRID_VP9_ALLOCATE_MDF_1D_BUFFER_UINT16(ctx, pMdfDevice, &pMdfDecodeEngine->CombinedFilters, VP9_HYBRID_DECODE_COMBINED_FILTER_SIZE);
 	Intel_HybridVp9Decode_ConstructCombinedFilters(pMdfDecodeEngine->CombinedFilters.pBuffer);
 
 finish:
@@ -2699,7 +2712,7 @@ VAStatus Intel_HybridVp9Decode_MdfHost_Execute(
 
 		else
 		{
-			pKernel->SetKernelArg(uiArgIndex++, VP9_HYBRID_DECODE_COMBINED_FILETER_SIZE, pMdfDecodeEngine->CombinedFilters.pu8Buffer);
+			pKernel->SetKernelArg(uiArgIndex++, VP9_HYBRID_DECODE_COMBINED_FILTER_SIZE, pMdfDecodeEngine->CombinedFilters.pu8Buffer);
 		}
 
 		// Create MDF Tasks and add kernels
