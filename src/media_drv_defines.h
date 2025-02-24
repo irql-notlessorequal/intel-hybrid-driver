@@ -53,7 +53,7 @@
 #define MEDIA_GEN_MAX_ENTRYPOINTS              4	// VAEntrypointHybridEnc
 #define MEDIA_GEN_MAX_CONFIG_ATTRIBUTES        46	// VAConfigAttribRTFormat plus VAConfigAttribRateControl
 #define MEDIA_GEN_MAX_IMAGE_FORMATS            5
-#define MEDIA_GEN_MAX_SUBPIC_FORMATS           0	// No longer supported.
+#define MEDIA_GEN_MAX_SUBPIC_FORMATS           4	// no sub-pic blending support, still set to 4 for further implementation
 #define MEDIA_GEN_MAX_SUBPIC                   4
 #define MEDIA_GEN_MAX_DISPLAY_ATTRIBUTES       4	// Use the same value as I965
 #define MEDIA_GEN_MAX_ATTRIBS_TYPE             4	//VAConfigAttribRTFormat,    VAConfigAttribRateControl,    VAConfigAttribDecSliceMode,    VAConfigAttribEncPackedHeaders
