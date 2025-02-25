@@ -1436,6 +1436,8 @@ media_SyncSurface(VADriverContextP ctx, VASurfaceID render_target)
 	return status;
 }
 
+#if VA_CHECK_VERSION(1, 9, 0)
+
 VAStatus
 media_SyncSurface2(VADriverContextP ctx, VASurfaceID render_target, uint64_t timeout_ns)
 {
@@ -1457,6 +1459,8 @@ media_SyncBuffer(VADriverContextP ctx, VABufferID buf_id, uint64_t timeout_ns)
 	status = media_sync_buffer(drv_ctx, buf_id, timeout_ns);
 	return status;
 }
+
+#endif /* VA_CHECK_VERSION */
 
 VAStatus
 media_EndPicture(VADriverContextP ctx, VAContextID context)

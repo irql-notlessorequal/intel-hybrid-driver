@@ -49,6 +49,8 @@ media_sync_surface(MEDIA_DRV_CONTEXT *drv_ctx, VASurfaceID render_target)
 	return VA_STATUS_SUCCESS;
 }
 
+#if VA_CHECK_VERSION(1, 9, 0)
+
 VAStatus
 media_sync_surface2(MEDIA_DRV_CONTEXT *drv_ctx, VASurfaceID render_target, uint64_t timeout_ns)
 {
@@ -101,6 +103,8 @@ media_sync_buffer(MEDIA_DRV_CONTEXT *drv_ctx, VABufferID buf_id, uint64_t timeou
 
 	return VA_STATUS_SUCCESS;
 }
+
+#endif /* VA_CHECK_VERSION */
 
 static VAStatus
 media_suface_external_memory(VADriverContextP ctx,
