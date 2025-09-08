@@ -26,20 +26,21 @@
  *
  */
 
-#include "media_drv_hw_g9.h"
-#include "media_drv_surface.h"
-#include <va/va.h>
+#ifndef _MEDIA__DRIVER_ENCODER_VP8_G8_H
+#define _MEDIA__DRIVER_ENCODER_VP8_G8_H
 
-struct hw_codec_info gen9_hw_codec_info = {
-    .max_width = 4096,
-    .max_height = 4096,
-    .tiled_surface = 1,
-    /* Supported natively in the main driver. */
-    .vp8_enc_hybrid_support = FALSE,
-    .vp9_dec_hybrid_support = TRUE,
-    .render_init = media_drv_gen9_render_init,
-};
+VOID media_mbenc_context_init_g8(VADriverContextP ctx,
+    MEDIA_ENCODER_CTX* encoder_context);
 
-VOID media_hw_context_init_g9(VADriverContextP ctx, MEDIA_HW_CONTEXT* hw_ctx)
-{
-}
+VOID media_mbpak_context_init_vp8_g8(VADriverContextP ctx,
+    MEDIA_ENCODER_CTX* encoder_context);
+
+VOID media_object_walker_pak_init_g8(UINT pak_phase_type, MEDIA_ENCODER_CTX* encoder_context, MEDIA_OBJ_WALKER_PARAMS* media_obj_walker_params);
+
+VOID media_object_walker_mbenc_init_g8(BOOL mbenc_i_frame_dist_in_use, BOOL mbenc_phase_2, MEDIA_ENCODER_CTX* encoder_context, MEDIA_OBJ_WALKER_PARAMS* media_obj_walker_params);
+
+VOID media_mbenc_context_init_vp8_g8(VADriverContextP ctx, MEDIA_ENCODER_CTX* encoder_context);
+
+VOID gpe_context_vfe_scoreboardinit_pak_p2_g8(MEDIA_ENCODER_CTX* encoder_context, MEDIA_GPE_CTX* gpe_context);
+
+#endif

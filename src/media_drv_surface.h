@@ -59,8 +59,6 @@ extern "C" {
 #define NEW_SURFACE_ID() object_heap_allocate(&drv_ctx->surface_heap);
 #define SURFACE(id) ((struct object_surface *)object_heap_lookup(&drv_ctx->surface_heap, id))
 
-
-
 typedef struct _input_surf_params
 {
   UINT width;

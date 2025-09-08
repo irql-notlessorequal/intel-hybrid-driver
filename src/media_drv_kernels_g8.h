@@ -22,24 +22,25 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * Authors:
- *     Midhunchandra Kodiyath <midhunchandra.kodiyath@intel.com>
+ *    Midhunchandra Kodiyath <midhunchandra.kodiyath@intel.com>
  *
  */
+#ifndef _MEDIA__DRIVER_KERNELS_G8_H
+#define _MEDIA__DRIVER_KERNELS_G8_H
 
-#include "media_drv_hw_g9.h"
-#include "media_drv_surface.h"
-#include <va/va.h>
+#include "media_drv_defines.h"
+#define MEDIA_VP8_MBENC_I_SZ_G8 0x5c00 //0x5ba0
+extern const UINT MEDIA_VP8_MBENC_I_G8[MEDIA_VP8_MBENC_I_SZ_G8];
 
-struct hw_codec_info gen9_hw_codec_info = {
-    .max_width = 4096,
-    .max_height = 4096,
-    .tiled_surface = 1,
-    /* Supported natively in the main driver. */
-    .vp8_enc_hybrid_support = FALSE,
-    .vp9_dec_hybrid_support = TRUE,
-    .render_init = media_drv_gen9_render_init,
-};
+#define MEDIA_VP8_MBENC_ICHROMA_SZ_G8 0x9e00
+extern const UINT MEDIA_VP8_MBENC_ICHROMA_G8[MEDIA_VP8_MBENC_ICHROMA_SZ_G8];
 
-VOID media_hw_context_init_g9(VADriverContextP ctx, MEDIA_HW_CONTEXT* hw_ctx)
-{
-}
+#define MEDIA_VP8_MBENC_FRM_P_SZ_G8 0x6e60
+extern const UINT MEDIA_VP8_MBENC_FRM_P_G8[MEDIA_VP8_MBENC_FRM_P_SZ_G8];
+
+#define MEDIA_VP8_PAK_PHASE1_SZ_G8 0x7760
+extern const UINT MEDIA_VP8_PAK_PHASE1_G8[MEDIA_VP8_PAK_PHASE1_SZ_G8];
+
+#define MEDIA_VP8_PAK_PHASE2_SZ_G8 0xa380
+extern const UINT MEDIA_VP8_PAK_PHASE2_G8[MEDIA_VP8_PAK_PHASE2_SZ_G8];
+#endif

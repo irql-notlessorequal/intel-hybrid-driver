@@ -83,8 +83,13 @@ driver_files = \
         media_drv_hybrid_vp9_common.cpp   \
         $(NULL)
 
+if BDW_VP8_ENCODING
+driver_files	+= media_drv_kernels_g8.c \
+                   media_drv_encoder_vp8_g8.c
+endif
+
 if USE_X11
-driver_files	+=media_drv_output_dri.c
+driver_files	+= media_drv_output_dri.c
 endif
 
 driver_headers = \
@@ -122,8 +127,13 @@ driver_headers = \
         media_drv_hybrid_vp9_common.h   \
        $(NULL)
 
+if BDW_VP8_ENCODING
+driver_headers	+= media_drv_kernels_g8.h \
+                   media_drv_encoder_vp8_g8.h
+endif
+
 if USE_X11
-driver_headers	+=media_drv_output_dri.h
+driver_headers	+= media_drv_output_dri.h
 endif
 
 hybrid_drv_video_la_LTLIBRARIES= hybrid_drv_video.la

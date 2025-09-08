@@ -58,6 +58,11 @@ AC_ARG_ENABLE([wayland],
                     [build with VA/Wayland API support @<:@default=yes@:>@])],
     [], [enable_wayland="yes"])
 
+AC_ARG_ENABLE([wayland],
+    [AC_HELP_STRING([--enable-bdw-vp8-enc],
+                    [build with Broadwell VP8 encoding @<:@default=no@:>@])],
+    [], [enable_bdw_vp8_enc="no"])
+
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 AC_PROG_CC
@@ -171,6 +176,8 @@ AM_CONDITIONAL(USE_WAYLAND, test "$USE_WAYLAND" = "yes")
 m4_ifdef([WAYLAND_SCANNER_RULES],
     [WAYLAND_SCANNER_RULES(['$(top_builddir)/src/wayland'])],
     [wayland_scanner_rules=""; AC_SUBST(wayland_scanner_rules)])
+
+AM_CONDITIONAL(BDW_VP8_ENCODING, test "$enable_bdw_vp8_enc" = "yes")
 
 AC_OUTPUT([
     Makefile
