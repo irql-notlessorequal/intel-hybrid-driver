@@ -192,16 +192,22 @@ typedef struct brc_distortion_surface_set_params_vp8 {
     UINT cacheability_control;
 } BRC_UPDATE_SURFACE_PARAMS_VP8;
 
+typedef enum supported_values
+{
+    NONE                         = 0,
+    TILED_SURFACE                = 0x2,
+    VP8_ENCODING_HYBRID          = 0x4,
+    VP9_DECODING_HYBRID          = 0x8,
+    HEVC_8BIT_DECODING_SOFTWARE  = 0x10,
+    HEVC_10BIT_DECODING_SOFTWARE = 0x20,
+};
+
 struct hw_codec_info {
     INT max_width;
     INT max_height;
 
     UINT ratecontrol;
-
-    BOOL tiled_surface;
-    BOOL vp8_enc_hybrid_support;
-    BOOL vp9_dec_hybrid_support;
-    BOOL __RESERVED__;
+    UINT supported;
 
     bool (*render_init)(VADriverContextP);
 };

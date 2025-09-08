@@ -43,14 +43,12 @@ struct hw_codec_info gen8_hw_codec_info = {
     .max_width = 4096,
     .max_height = 4096,
 
-    .tiled_surface = 1,
 #if defined(BDW_VP8_ENCODING)
-    .vp8_enc_hybrid_support = BDW_VP8_ENCODING,
+    .supported = TILED_SURFACE | VP8_ENCODING_HYBRID | VP9_DECODING_HYBRID,
 #else
-    .vp8_enc_hybrid_support = FALSE,
+    .supported = TILED_SURFACE | VP9_DECODING_HYBRID,
 #endif
-    .vp9_dec_hybrid_support = TRUE,
-
+    
     .ratecontrol = VA_RC_CQP,
     .render_init = media_drv_gen8_render_init,
 };
@@ -58,10 +56,8 @@ struct hw_codec_info gen8_hw_codec_info = {
 struct hw_codec_info chv_hw_codec_info = {
     .max_width = 4096,
     .max_height = 4096,
-    /* Supported natively in the main driver. */
-    .vp8_enc_hybrid_support = FALSE,
-    .vp9_dec_hybrid_support = TRUE,
-    .tiled_surface = 1,
+    /* VP8 encoding is supported natively in the main driver. */
+    .supported = TILED_SURFACE | VP9_DECODING_HYBRID,
     .render_init = media_drv_gen8_render_init,
 };
 

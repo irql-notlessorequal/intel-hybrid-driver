@@ -37,9 +37,7 @@
 struct hw_codec_info gen7_hw_codec_info = {
     .max_width = 4096,
     .max_height = 4096,
-    .tiled_surface = 1,
-    .vp8_enc_hybrid_support = TRUE,
-    .vp9_dec_hybrid_support = FALSE,
+    .supported = TILED_SURFACE | VP8_ENCODING_HYBRID,
     .ratecontrol = VA_RC_CQP | VA_RC_CBR | VA_RC_VBR,
 };
 

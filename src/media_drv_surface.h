@@ -55,7 +55,7 @@ extern "C" {
 #define SURFACE_ALL_MASK        ((SURFACE_REFERENCED) | \
                                  (SURFACE_DISPLAYED) |  \
                                  (SURFACE_DERIVED))
-#define HAS_TILED_SURFACE(drv_ctx) ((drv_ctx)->codec_info->tiled_surface)
+#define HAS_TILED_SURFACE(drv_ctx) ((drv_ctx)->codec_info->supported & TILED_SURFACE)
 #define NEW_SURFACE_ID() object_heap_allocate(&drv_ctx->surface_heap);
 #define SURFACE(id) ((struct object_surface *)object_heap_lookup(&drv_ctx->surface_heap, id))
 

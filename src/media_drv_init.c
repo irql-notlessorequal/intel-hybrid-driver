@@ -2295,7 +2295,7 @@ media_validate_config(VADriverContextP ctx, VAProfile profile,
   switch (profile) {
   case VAProfileVP8Version0_3:
     if ((entrypoint == VAEntrypointEncSlice) &&
-        drv_ctx->codec_info->vp8_enc_hybrid_support) {
+        drv_ctx->codec_info->supported & VP8_ENCODING_HYBRID) {
       va_status = VA_STATUS_SUCCESS;
     } else {
       va_status = VA_STATUS_ERROR_UNSUPPORTED_ENTRYPOINT;
@@ -2303,7 +2303,7 @@ media_validate_config(VADriverContextP ctx, VAProfile profile,
     break;
   case VAProfileVP9Profile0:
     if ((entrypoint == VAEntrypointVLD) &&
-        drv_ctx->codec_info->vp9_dec_hybrid_support) {
+        drv_ctx->codec_info->supported & VP9_DECODING_HYBRID) {
       va_status = VA_STATUS_SUCCESS;
     } else {
       va_status = VA_STATUS_ERROR_UNSUPPORTED_ENTRYPOINT;
@@ -2488,12 +2488,20 @@ media_QueryConfigProfiles (VADriverContextP ctx, VAProfile * profile_list,	/* ou
   MEDIA_DRV_ASSERT (num_profiles);
   int i = 0;
 
-  if (drv_ctx->codec_info->vp8_enc_hybrid_support) {
+  if (drv_ctx->codec_info->supported & VP8_ENCODING_HYBRID) {
     profile_list[i++] = VAProfileVP8Version0_3;
   }
 
-  if (drv_ctx->codec_info->vp9_dec_hybrid_support) {
+  if (drv_ctx->codec_info->supported & VP9_DECODING_HYBRID) {
     profile_list[i++] = VAProfileVP9Profile0;
+  }
+
+  if (drv_ctx->codec_info->supported & HEVC_8BIT_DECODING_SOFTWARE) {
+    profile_list[i++] = VAProfileHEVCMain;
+  }
+
+  if (drv_ctx->codec_info->supported & HEVC_10BIT_DECODING_SOFTWARE) {
+    profile_list[i++] = VAProfileHEVCMain10;
   }
 
   profile_list[i++] = VAProfileNone;
@@ -2511,15 +2519,25 @@ media_QueryConfigEntrypoints (VADriverContextP ctx, VAProfile profile, VAEntrypo
   switch (profile)
     {
     case VAProfileVP8Version0_3:
-      if (drv_ctx->codec_info->vp8_enc_hybrid_support) {
+      if (drv_ctx->codec_info->supported & VP8_ENCODING_HYBRID) {
         entrypoint_list[index++] = (VAEntrypoint) VAEntrypointEncSlice;
       }
       break;
     case VAProfileVP9Profile0:
-      if (drv_ctx->codec_info->vp9_dec_hybrid_support) {
+      if (drv_ctx->codec_info->supported & VP9_DECODING_HYBRID) {
         entrypoint_list[index++] = (VAEntrypoint) VAEntrypointVLD;
       }
       break;
+    case VAProfileHEVCMain:
+      if (drv_ctx->codec_info->supported & HEVC_8BIT_DECODING_SOFTWARE) {
+        entrypoint_list[index++] = (VAEntrypoint) VAEntrypointVLD;
+      }
+      break;
+    case VAProfileHEVCMain10:
+      if (drv_ctx->codec_info->supported & HEVC_10BIT_DECODING_SOFTWARE) {
+        entrypoint_list[index++] = (VAEntrypoint) VAEntrypointVLD;
+      }
+      break;    
     default:
       //printf ("Unsupported profile\n");
       break;
